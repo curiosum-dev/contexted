@@ -5,8 +5,8 @@ on:
   pull_request:
 
 env:
-  ELIXIR_VERSION: 1.12.3
-  OTP_VERSION: 24.0.4
+  ELIXIR_VERSION: 1.14.4
+  OTP_VERSION: 25.3
   MIX_ENV: test
 
 jobs:
