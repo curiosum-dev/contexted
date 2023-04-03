@@ -5,7 +5,7 @@ defmodule Context.Tracer do
   This is useful when you want to ensure that certain modules do not reference each other directly within your application.
   """
 
-  @contexts Application.compile_env!(:context, :contexts) || []
+  @contexts Application.compile_env(:context, :contexts, [])
 
   @doc """
   A guard to check if `env.module` and `module` are both in the `contexts` and if they are not equal.
