@@ -29,12 +29,12 @@ To describe a sample usage of this library, let's assume that your project has t
 - `Blog`
 
 Our goal, as the project grows, is to:
-1. Divide each context into smaller parts so that it is easier to maintain. In this case, we'll refer to each of these parts as Subcontext. It's not a new term added to the Phoenix framework but rather something we came up with, so point out that it's a subset of Context. For this to work, we'll use delegates.
-2. Keep each context as a separate part and do not produce any cross-references. For this to work, we'll catch errors on compile time whenever such a cross-reference happens.
+1. Divide each context into smaller parts so that it is easier to maintain. In this case, we'll refer to each of these parts as Subcontext. It's not a new term added to the Phoenix framework but rather something we came up with, to point out that it's a subset of Context. For this to work, we'll use delegates.
+2. Keep each context as a separate part and do not produce any cross-references. For this to work, we'll raise errors on compile time whenever such a cross-reference happens.
 
 ### Dividing each context into smaller parts
 
-To divide big Context into smaller Subcontexts, we simply use defdelegates. Let's assume that the `Account` context has `User`, `UserToken` and `Admin` resources. Here is how we can deal with it, thanks to `Context.Delegator`:
+To divide big Context into smaller Subcontexts, we simply use `defdelegate`. Let's assume that the `Account` context has `User`, `UserToken` and `Admin` resources. Here is how we can deal with it, thanks to `Context.Delegator`:
 ```elixir
 # Users subcontext
 
