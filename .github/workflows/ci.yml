@@ -22,14 +22,14 @@ jobs:
       run: |
         elixir_version=$(grep -oP "elixir\s+\K.+" .tool-versions)
         otp_version=$(grep -oP "erlang\s+\K.+" .tool-versions)
-        echo "::set-output name=elixir_version::$elixir_version"
-        echo "::set-output name=otp_version::$otp_version"
+        echo "elixir_version=$elixir_version" >> $GITHUB_ENV
+        echo "otp_version=$otp_version" >> $GITHUB_ENV
 
     - name: Set up Elixir
       uses: erlef/setup-elixir@v1
       with:
-        elixir-version: ${{ steps.extract_versions.outputs.elixir_version }}
-        otp-version: ${{ steps.extract_versions.outputs.otp_version }}
+        elixir-version: ${{ env.elixir_version }}
+        otp-version: ${{ env.otp_version }}
 
     - name: Restore dependencies and _build cache
       uses: actions/cache@v2
