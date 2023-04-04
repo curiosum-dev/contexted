@@ -26,3 +26,5 @@ context-*.tar
 /tmp/
 /.direnv/
 /.envrc
+/.nix-mix/
+/.nix-hex/
