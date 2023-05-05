@@ -96,8 +96,7 @@ defmodule Context.ModuleAnalyzer do
   defp format_arg_types({:type, _, :product, []}), do: ""
 
   defp format_arg_types({:type, _, :product, arg_types}) do
-    Enum.map(arg_types, &format_type/1)
-    |> Enum.join(", ")
+    Enum.map_join(arg_types, ",", &format_type/1)
   end
 
   @spec format_type(tuple()) :: String.t()
