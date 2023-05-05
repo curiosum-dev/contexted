@@ -8,70 +8,78 @@ defmodule Context.Tracer do
   @contexts Application.compile_env(:context, :contexts, [])
 
   @doc """
-  A guard to check if `env.module` and `module` are both in the `contexts` and if they are not equal.
-
-  Usage:
-
-      def some_function(env, module, contexts) when module_mismatch(env, module, contexts) do
-        # Function body
-      end
-
-  ## Parameters
-
-  - `env`: A map containing the `module` key, which should be checked against the `contexts`.
-  - `module`: The module to be checked against the `contexts`.
-  - `contexts`: A list of modules that contains both `env.module` and `module`.
-
-  ## Examples
-
-      iex> Guard.module_mismatch(%{module: :foo}, :bar, [:foo, :bar, :baz])
-      true
-
-      iex> Guard.module_mismatch(%{module: :foo}, :foo, [:foo, :bar, :baz])
-      false
-  """
-  defguardp module_mismatch(env, module)
-            when env.module in @contexts and
-                   module in @contexts and
-                   env.module != module
-
-  @doc """
   Checks if the provided event is an alias reference between two context modules.
 
   If so, raises an error with an appropriate message.
   """
-  def trace({:alias_reference, _line_details, module}, env) when module_mismatch(env, module) do
-    raise_error(env.module, module)
+  @spec trace(tuple(), map()) :: :ok
+  def trace({action, _line_details, module}, env) when action in [:alias_reference] do
+    verify_modules_mismatch(env.module, module)
   end
 
-  def trace({:imported_function, _meta, module, _name, _arity}, env)
-      when module_mismatch(env, module) do
-    raise_error(env.module, module)
+  def trace({action, _meta, module, _name, _arity}, env)
+      when action in [:imported_function, :remote_function, :remote_macro] do
+    verify_modules_mismatch(env.module, module)
   end
 
-  def trace({:require, _meta, module, _opts}, env)
-      when module_mismatch(env, module) do
-    raise_error(env.module, module)
+  def trace({action, _meta, module, _opts}, env) when action in [:require] do
+    verify_modules_mismatch(env.module, module)
   end
 
-  def trace({:remote_function, _meta, module, _name, _arity}, env)
-      when module_mismatch(env, module) do
-    raise_error(env.module, module)
+  def trace(_event, _env), do: :ok
+
+  @spec after_compiler(tuple()) :: tuple()
+  def after_compiler({status, diagnostics}) do
+    beam_files_folder = extract_beam_files_folder()
+    file_paths = remove_context_beams_and_return_module_paths()
+
+    Kernel.ParallelCompiler.compile_to_path(file_paths, beam_files_folder)
+
+    {status, diagnostics}
   end
 
-  def trace({:remote_macro, _meta, module, _name, _arity}, env)
-      when module_mismatch(env, module) do
-    raise_error(env.module, module)
+  @spec extract_beam_files_folder :: String.t()
+  defp extract_beam_files_folder do
+    first_context = List.first(@contexts)
+    compiled_file_path = :code.which(first_context) |> List.to_string()
+    compiled_file_name = Path.basename(compiled_file_path)
+    String.replace(compiled_file_path, compiled_file_name, "")
   end
 
-  @doc """
-  Ignores other events and returns :ok.
-  """
-  def trace(_event, _env) do
-    :ok
+  @spec remove_context_beams_and_return_module_paths :: list(String.t())
+  defp remove_context_beams_and_return_module_paths do
+    @contexts
+    |> Enum.map(fn module ->
+      file_path = module.__info__(:compile)[:source] |> List.to_string()
+
+      :code.which(module) |> List.to_string() |> File.rm()
+
+      file_path
+    end)
   end
 
-  defp raise_error(module1, module2) do
-    raise "You can't reference a #{module1} context within #{module2} context"
+  @spec verify_modules_mismatch(module(), module()) :: :ok
+  defp verify_modules_mismatch(analyzed_module, referenced_module) do
+    analyzed_context_module = map_module_to_context_module(analyzed_module)
+    referenced_context_module = map_module_to_context_module(referenced_module)
+
+    if analyzed_context_module != nil and
+         referenced_context_module != nil and
+         analyzed_context_module != referenced_context_module do
+      raise "You can't reference a #{analyzed_context_module} context within #{referenced_context_module} context"
+    else
+      :ok
+    end
+  end
+
+  @spec map_module_to_context_module(module()) :: module() | nil
+  defp map_module_to_context_module(module) do
+    Enum.find(@contexts, fn context ->
+      stringified_context = Atom.to_string(context)
+      stringified_module = Atom.to_string(module)
+
+      String.contains?(stringified_module, stringified_context) ||
+        stringified_context == stringified_module
+    end)
   end
 end

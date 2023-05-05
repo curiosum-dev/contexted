@@ -2,7 +2,14 @@ defmodule Context.Subcontext do
   @moduledoc """
   The `Context.Subcontext` module generates common CRUD functions for a context, similar to `mix phx gen context`.
 
-  Use this module in your context or subcontext by calling `use Context.Subcontext`.
+  Use this module in your context or subcontext by calling
+  ```elixr
+  use Context.Subcontext,
+    repo: # here goes the app repo,
+    schema: # here goes the subcontext schema,
+    exclude: # list of excluded functions,
+    resource_name_plural: # plural form of resource name
+  ```
 
   ## Options
 
@@ -21,6 +28,7 @@ defmodule Context.Subcontext do
       exclude: [:delete],
       resource_name_plural: "users"
   end
+  ```
 
   This sample usage will generate all CRUD functions except for delete_user/1.
 
@@ -72,16 +80,14 @@ defmodule Context.Subcontext do
         end
       end
 
-      unless :get! in exclude do
+      unless :get in exclude do
         function_name = String.to_atom("get_#{resource_name}")
 
         def unquote(function_name)(id) do
           unquote(schema)
           |> unquote(repo).get(id)
         end
-      end
 
-      unless :get! in exclude do
         function_name = String.to_atom("get_#{resource_name}!")
 
         def unquote(function_name)(id) do
@@ -98,9 +104,7 @@ defmodule Context.Subcontext do
           |> unquote(schema).changeset(attrs)
           |> unquote(repo).insert()
         end
-      end
 
-      unless :create! in exclude do
         function_name = String.to_atom("create_#{resource_name}!")
 
         def unquote(function_name)(attrs \\ %{}) do
@@ -118,9 +122,7 @@ defmodule Context.Subcontext do
           |> unquote(schema).changeset(attrs)
           |> unquote(repo).update()
         end
-      end
 
-      unless :update! in exclude do
         function_name = String.to_atom("update_#{resource_name}!")
 
         def unquote(function_name)(record, attrs \\ %{}) do
@@ -137,14 +139,21 @@ defmodule Context.Subcontext do
           record
           |> unquote(repo).delete()
         end
-      end
 
-      unless :delete! in exclude do
         function_name = String.to_atom("delete_#{resource_name}!")
 
         def unquote(function_name)(record) do
           record
           |> unquote(repo).delete!()
+        end
+      end
+
+      unless :change in exclude do
+        function_name = String.to_atom("change_#{resource_name}")
+
+        def unquote(function_name)(record, attrs \\ %{}) do
+          record
+          |> unquote(schema).changeset(attrs)
         end
       end
     end
