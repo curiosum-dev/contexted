@@ -1,6 +1,6 @@
-# Context Library for Elixir
+# Contexted Library for Elixir
 
-Context is a library for Elixir that adds nice features for working with contexts. It provides tools for tracing and enforcing separation between specific modules, as well as a convenient macro for delegating all functions from one module to another.
+Contexted is a library for Elixir that adds nice features for working with contexts. It provides tools for tracing and enforcing separation between specific modules, as well as a convenient macro for delegating all functions from one module to another.
 
 ## Features
 
@@ -14,7 +14,7 @@ Add the following to your `mix.exs` file:
 ```elixir
 defp deps do
   [
-    {:context, "~> 0.1.0"}
+    {:contexted, "~> 0.1.0"}
   ]
 end
 ```
@@ -29,12 +29,12 @@ To describe a sample usage of this library, let's assume that your project has t
 - `Blog`
 
 Our goal, as the project grows, is to:
-1. Divide each context into smaller parts so that it is easier to maintain. In this case, we'll refer to each of these parts as Subcontext. It's not a new term added to the Phoenix framework but rather something we came up with, to point out that it's a subset of Context. For this to work, we'll use delegates.
+1. Divide each context into smaller parts so that it is easier to maintain. In this case, we'll refer to each of these parts as Subcontext. It's not a new term added to the Phoenix framework but rather something we came up with, to point out that it's a subset of Contexted. For this to work, we'll use delegates.
 2. Keep each context as a separate part and do not produce any cross-references. For this to work, we'll raise errors on compile time whenever such a cross-reference happens.
 
 ### Dividing each context into smaller parts
 
-To divide big Context into smaller Subcontexts, we simply use `defdelegate`. Let's assume that the `Account` context has `User`, `UserToken` and `Admin` resources. Here is how we can deal with it, thanks to `Context.Delegator`:
+To divide big Contexted into smaller Subcontexts, we simply use `defdelegate`. Let's assume that the `Account` context has `User`, `UserToken` and `Admin` resources. Here is how we can deal with it, thanks to `Contexted.Delegator`:
 ```elixir
 # Users subcontext
 
@@ -63,7 +63,7 @@ end
 # Account context
 
 defmodule App.Account do
-  import Context.Delegator
+  import Contexted.Delegator
   
   delegate_all App.Account.Users
   delegate_all App.Account.UserTokens
@@ -93,7 +93,7 @@ First, add context as one of the compilers:
 def project do
   [
     ...
-    compilers: [:context, :phoenix, :gettext] ++ Mix.compilers(),
+    compilers: [:contexted] ++ Mix.compilers(),
     ...
   ]
 end
@@ -102,7 +102,7 @@ end
 Next, define a list of contexts available in the app:
 ```elixir
 # config/config.exs
-config :context, contexts: [
+config :contexted, contexts: [
   # list of contexts goes here, for instance: [App.Account, App.Subscription, App.Blog]
 ]
 ```
