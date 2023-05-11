@@ -1,10 +1,10 @@
 defmodule Contexted.ModuleAnalyzer do
   @moduledoc """
-  A module serving as a container for helpers that analyzes and extracts information from other modules.
+  The `Contexted.ModuleAnalyzer` defines utils functions that analyze and extract information from other modules.
   """
 
   @doc """
-  Fetches the documentation for all functions within the given module.
+  Fetches the `@doc` definitions for all functions within the given module.
   """
   @spec get_module_docs(module()) :: [tuple()]
   def get_module_docs(module) do
@@ -18,7 +18,7 @@ defmodule Contexted.ModuleAnalyzer do
   end
 
   @doc """
-  Fetches the typespecs for all functions within the given module.
+  Fetches the `@spec` definitions for all functions within the given module.
   """
   @spec get_module_specs(module()) :: [tuple()]
   def get_module_specs(module) do
@@ -29,8 +29,8 @@ defmodule Contexted.ModuleAnalyzer do
   end
 
   @doc """
-  Finds and returns the typespec string for the specified function name and arity within the given specs.
-  Returns nil if the function is not found in the specs.
+  Finds and returns the `@spec` definition in string format for the specified function name and arity.
+  Returns `nil` if the function is not found in the specs.
   """
   @spec get_function_spec([tuple()], atom(), non_neg_integer()) :: String.t() | nil
   def get_function_spec(specs, function_name, arity) do
@@ -46,17 +46,20 @@ defmodule Contexted.ModuleAnalyzer do
   end
 
   @doc """
-  Finds and returns the documentation string for the specified function name and arity within the given function docs.
-  Returns an empty string if the function is not found in the function docs.
+  Finds and returns the `@doc` definition in string format for the specified function name and arity.
+  Returns `nil` if the function is not found in the function docs.
   """
-  @spec get_function_doc([tuple()], atom(), non_neg_integer()) :: String.t()
+  @spec get_function_doc([tuple()], atom(), non_neg_integer()) :: String.t() | nil
   def get_function_doc(functions_docs, name, arity) do
     Enum.find(functions_docs, fn {{:function, func_name, func_arity}, _, _, _, _} ->
       func_name == name && func_arity == arity
     end)
     |> case do
-      {_, _, _, %{"en" => doc}, _} -> doc
-      _ -> ""
+      {_, _, _, %{"en" => doc}, _} ->
+        "@doc \"\"\"\n#{doc}\n\"\"\""
+
+      _ ->
+        nil
     end
   end
 

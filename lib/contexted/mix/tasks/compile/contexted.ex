@@ -10,6 +10,7 @@ defmodule Mix.Tasks.Compile.Contexted do
   @doc """
   Sets the custom compiler tracer to the Contexted.Tracer module.
   """
+  @spec run(any()) :: :ok
   def run(_argv) do
     if recompilation_enabled?() do
       Mix.Task.Compiler.after_compiler(:app, &Tracer.after_compiler/1)

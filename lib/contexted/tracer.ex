@@ -8,7 +8,9 @@ defmodule Contexted.Tracer do
   @contexts Application.compile_env(:contexted, :contexts, [])
 
   @doc """
-  Checks if the provided event is an alias reference between two context modules.
+  Trace events are emitted during compilation.
+
+  `trace` function verifies if the provided event contains cross-references between two contexts.
 
   If so, raises an error with an appropriate message.
   """
@@ -28,6 +30,14 @@ defmodule Contexted.Tracer do
 
   def trace(_event, _env), do: :ok
 
+  @doc """
+  To support automatic docs and specs generation in delegated functions inside contexts, all of the modules have to be compiled first.
+
+  Because of that, we need to run this operation in after compiler callback in two steps:
+
+  1. Remove all contexts beam files.
+  2. Generate contexts beam files again.
+  """
   @spec after_compiler(tuple()) :: tuple()
   def after_compiler({status, diagnostics}) do
     beam_files_folder = extract_beam_files_folder()
@@ -66,7 +76,13 @@ defmodule Contexted.Tracer do
     if analyzed_context_module != nil and
          referenced_context_module != nil and
          analyzed_context_module != referenced_context_module do
-      raise "You can't reference a #{analyzed_context_module} context within #{referenced_context_module} context"
+      stringed_referenced_context_module =
+        Atom.to_string(referenced_context_module) |> String.replace("Elixir.", "")
+
+      stringed_analyzed_context_module =
+        Atom.to_string(analyzed_context_module) |> String.replace("Elixir.", "")
+
+      raise "You can't reference #{stringed_referenced_context_module} context within #{stringed_analyzed_context_module} context."
     else
       :ok
     end

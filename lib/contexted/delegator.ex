@@ -15,7 +15,7 @@ defmodule Contexted.Delegator do
         delegate_all MyTargetModule
       end
 
-  All public functions defined in `MyTargetModule` will now be accessible through `MyModule`.
+  All public functions defined in `MyTargetModule` will now be accessible within `MyModule`.
 
   Note: This macro should be used with caution, as it may lead to unexpected behaviors if two modules with overlapping function names are delegated.
   """
@@ -23,7 +23,7 @@ defmodule Contexted.Delegator do
   alias Contexted.ModuleAnalyzer
 
   @doc """
-  Delegates all public functions of the given `module` to the module using the macro.
+  Delegates all public functions of the given `module`.
 
   ## Examples
 
@@ -33,7 +33,7 @@ defmodule Contexted.Delegator do
         delegate_all MyTargetModule
       end
 
-  All public functions defined in `MyTargetModule` will now be accessible through `MyModule`.
+  All public functions defined in `MyTargetModule` will now be accessible within `MyModule`.
   """
   defmacro delegate_all(module) do
     # Ensure the module is an atom
@@ -62,7 +62,7 @@ defmodule Contexted.Delegator do
     delegates =
       Enum.map(functions, fn {name, _arity, args, doc, spec} ->
         quote do
-          @doc unquote(doc)
+          if unquote(doc), do: unquote(Code.string_to_quoted!(doc))
           if unquote(spec), do: unquote(Code.string_to_quoted!(spec))
 
           defdelegate unquote(name)(unquote_splicing(args)),
