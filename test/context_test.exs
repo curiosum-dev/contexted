@@ -1,4 +1,4 @@
-defmodule ContextTest do
+defmodule ContextedTest do
   use ExUnit.Case
-  doctest Context
+  doctest Contexted
 end

@@ -1,3 +1,3 @@
-defmodule Context do
+defmodule Contexted do
   @moduledoc false
 end
