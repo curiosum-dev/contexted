@@ -2,45 +2,57 @@ defmodule Contexted.Delegator do
   @moduledoc """
   The `Contexted.Delegator` module provides a macro to delegate all functions defined within a specific module.
 
-  This module can be used to forward all function calls from one module to another, without the need to write
+  This module can be used to forward all function calls from one module to another without the need to write
   individual `defdelegate` statements for each function.
 
   ## Usage
 
   To use the `delegate_all` macro, simply include it in your module and pass the target module as an argument:
 
-      defmodule MyModule do
+      defmodule MyContextModule do
         import Contexted.Delegator
 
-        delegate_all MyTargetModule
+        delegate_all MyTargetSubcontextModule
       end
 
-  All public functions defined in `MyTargetModule` will now be accessible through `MyModule`.
+  All public functions defined in `MyTargetSubcontextModule` will now be accessible within `MyContextModule`.
 
   Note: This macro should be used with caution, as it may lead to unexpected behaviors if two modules with overlapping function names are delegated.
+
+  ## Additional configuration
+
+  The `Contexted.Delegator` module can be used without `Mix.Tasks.Compile.Contexted` as one of the compilers.
+
+  However, if you wish to enable automatic `@doc` and `@spec` generation for delegated functions, you will need to set the following config:
+
+      config :contexted,
+        enable_recompilation: true
   """
 
   alias Contexted.ModuleAnalyzer
 
   @doc """
-  Delegates all public functions of the given `module` to the module using the macro.
+  Delegates all public functions of the given module.
 
   ## Examples
 
-      defmodule MyModule do
+      defmodule MyContextModule do
         import Contexted.Delegator
 
-        delegate_all MyTargetModule
+        delegate_all MyTargetSubcontextModule
       end
 
-  All public functions defined in `MyTargetModule` will now be accessible through `MyModule`.
+  All public functions defined in `MyTargetSubcontextModule` will now be accessible within `MyContextModule`.
   """
   defmacro delegate_all(module) do
     # Ensure the module is an atom
     module =
       case module do
-        {:__aliases__, _, _} -> apply(Macro, :expand, [module, __CALLER__])
-        _ -> module
+        {:__aliases__, _, _} ->
+          Macro.expand(module, __CALLER__)
+
+        _ ->
+          module
       end
 
     functions_docs = ModuleAnalyzer.get_module_docs(module)
@@ -62,7 +74,7 @@ defmodule Contexted.Delegator do
     delegates =
       Enum.map(functions, fn {name, _arity, args, doc, spec} ->
         quote do
-          @doc unquote(doc)
+          if unquote(doc), do: unquote(Code.string_to_quoted!(doc))
           if unquote(spec), do: unquote(Code.string_to_quoted!(spec))
 
           defdelegate unquote(name)(unquote_splicing(args)),

@@ -2,6 +2,7 @@ defmodule Mix.Tasks.Compile.Contexted do
   use Mix.Task.Compiler
 
   alias Contexted.Tracer
+  alias Mix.Task.Compiler
 
   @moduledoc """
   A custom Elixir compiler task that checks for cross-references between specific modules, known as "contexts".
@@ -10,9 +11,10 @@ defmodule Mix.Tasks.Compile.Contexted do
   @doc """
   Sets the custom compiler tracer to the Contexted.Tracer module.
   """
+  @spec run(any()) :: :ok
   def run(_argv) do
     if recompilation_enabled?() do
-      Mix.Task.Compiler.after_compiler(:app, &Tracer.after_compiler/1)
+      Compiler.after_compiler(:app, &Tracer.after_compiler/1)
     end
 
     tracers = Code.get_compiler_option(:tracers)
