@@ -28,7 +28,7 @@ end
 
 Then run `mix deps.get`.
 
-## Step by step
+## Step by step overview
 
 To describe a sample usage of this library, let's assume that your project has three contexts:
 - `Account`
@@ -36,7 +36,7 @@ To describe a sample usage of this library, let's assume that your project has t
 - `Blog`
 
 Our goal, as the project grows, is to:
-1. Keep contexts separate and don't create any cross-references. For this to work, we'll raise errors during compilation whenever such a cross-reference happens.
+1. Keep contexts separate and not create any cross-references. For this to work, we'll raise errors during compilation whenever such a cross-reference happens.
 2. Divide each context into smaller parts so that it is easier to maintain. In this case, we'll refer to each of these parts as **Subcontext**. It's not a new term added to the Phoenix framework but rather a term proposed to emphasize that it's a subset of Context. For this to work, we'll use delegates.
 3. Not repeat ourselves with common business logic operations. For this to work, we'll be using CRUD functions generator, since these are the most common.
 
@@ -46,7 +46,6 @@ It's very easy to monitor cross-references between context modules with the `con
 
 First, add `contexted` as one of the compilers in *mix.exs*:
 ```elixir
-# mix.exs
 def project do
   [
     ...
@@ -58,9 +57,8 @@ end
 
 Next, define a list of contexts available in the app inside *config.exs*:
 ```elixir
-# config/config.exs
 config :contexted, contexts: [
-  # list of contexts goes here, for instance:
+  # list of context modules goes here, for instance:
   # [App.Account, App.Subscription, App.Blog]
 ]
 ```
@@ -74,7 +72,7 @@ And that's it. From now on, whenever you will cross-reference one context with a
 
 ### Dividing each context into smaller parts
 
-To divide big Context into smaller Subcontexts, we simply use `delegate_all/1` macro from `Contexted.Delegator` module.
+To divide big Context into smaller Subcontexts, we can use `delegate_all/1` macro from `Contexted.Delegator` module.
 
 Let's assume that the `Account` context has `User`, `UserToken` and `Admin` resources. Here is how we can split the context module:
 ```elixir
@@ -178,4 +176,4 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 # License
 
-Distributed under the MIT License. See [LICENSE.md](LICENSE.md) for more information.
+Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
