@@ -34,7 +34,7 @@ defmodule Contexted.MixProject do
       licenses: ["MIT"],
       maintainers: ["Curiosum"],
       links: %{"GitHub" => "https://github.com/curiosum-dev/contexted"},
-      files: ~w(lib priv dist mix.exs CHANGELOG.md README.md LICENSE)
+      files: ~w(lib mix.exs README.md LICENSE)
     ]
   end
 end

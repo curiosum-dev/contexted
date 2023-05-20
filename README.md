@@ -1,6 +1,16 @@
 # Contexted
 
-[![CI Status](https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml/badge.svg)](https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml)
+<div>
+  <a href="https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml">
+    <img alt="CI Status" src="https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml/badge.svg">
+  </a>
+  <a href="https://hex.pm/packages/contexted">
+    <img alt="Hex Version" src="https://img.shields.io/hexpm/v/contexted.svg">
+  </a>
+  <a href="https://hexdocs.pm/contexted">
+    <img alt="Hex Docs" src="http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat">
+  </a>
+</div>
 
 [Contexts](https://hexdocs.pm/phoenix/contexts.html) in Elixir & Phoenix are getting complicated over time.
 Cross-referencing, big modules and repetitiveness are the most common reasons for this problem.
