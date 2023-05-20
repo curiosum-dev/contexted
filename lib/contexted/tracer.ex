@@ -37,6 +37,11 @@ defmodule Contexted.Tracer do
 
   1. Remove all contexts beam files.
   2. Generate contexts beam files again.
+
+  This is an opt-in step, so in order to enable it, you will have to set this config:
+
+      config :contexted,
+        enable_recompilation: true
   """
   @spec after_compiler(tuple()) :: tuple()
   def after_compiler({status, diagnostics}) do

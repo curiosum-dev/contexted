@@ -24,3 +24,6 @@ context-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# Desktop Services Store
+.DS_Store
