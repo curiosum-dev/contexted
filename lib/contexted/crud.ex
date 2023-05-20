@@ -55,6 +55,7 @@ defmodule Contexted.CRUD do
     plural_resource_name =
       if plural_resource_name, do: plural_resource_name, else: "#{resource_name}s"
 
+    # credo:disable-for-next-line Credo.Check.Refactor.LongQuoteBlocks
     quote bind_quoted: [
             repo: repo,
             schema: schema,

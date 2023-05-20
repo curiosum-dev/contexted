@@ -48,8 +48,11 @@ defmodule Contexted.Delegator do
     # Ensure the module is an atom
     module =
       case module do
-        {:__aliases__, _, _} -> apply(Macro, :expand, [module, __CALLER__])
-        _ -> module
+        {:__aliases__, _, _} ->
+          Macro.expand(module, __CALLER__)
+
+        _ ->
+          module
       end
 
     functions_docs = ModuleAnalyzer.get_module_docs(module)
