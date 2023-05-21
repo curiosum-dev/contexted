@@ -1,5 +1,7 @@
 # Contexted
 
+<br/>
+
 <div>
   <a href="https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml">
     <img alt="CI Status" src="https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml/badge.svg">
@@ -12,17 +14,46 @@
   </a>
 </div>
 
+<br/>
+
 [Contexts](https://hexdocs.pm/phoenix/contexts.html) in Elixir & Phoenix are getting complicated over time.
 Cross-referencing, big modules and repetitiveness are the most common reasons for this problem.
 
 Contexted arms you with a set of tools to maintain contexts well.
 
+<br/>
+
+---
+
+_Note: Official documentation for contexted library is [available on hexdocs][hexdoc]._
+
+[hexdoc]: https://hexdocs.pm/contexted
+
+--- 
+
+<br/>
+
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Step by step overview](#step-by-step-overview)
+  - [Keep contexts separate](#keep-contexts-separate)
+  - [Dividing each context into smaller parts](#dividing-each-context-into-smaller-parts)
+    - [Being able to access docs and specs in auto-delegated functions](#being-able-to-access-docs-and-specs-in-auto-delegated-functions)
+  - [Don't repeat yourself with CRUD operations](#dont-repeat-yourself-with-crud-operations)
+- [Contributing](#contributing)
+- [License](#license)
+
+<br/>
 
 ## Features
 
 - `Contexted.Tracer` - trace and enforce definite separation between specific context modules.
 - `Contexted.Delegator` - divide the big context module into smaller parts and use delegations to build the final context.
 - `Contexted.CRUD` - auto-generate the most common CRUD operations whenever needed.
+
+<br/>
 
 ## Installation
 
@@ -38,6 +69,8 @@ end
 
 Then run `mix deps.get`.
 
+<br/>
+
 ## Step by step overview
 
 To describe a sample usage of this library, let's assume that your project has three contexts:
@@ -49,6 +82,8 @@ Our goal, as the project grows, is to:
 1. Keep contexts separate and not create any cross-references. For this to work, we'll raise errors during compilation whenever such a cross-reference happens.
 2. Divide each context into smaller parts so that it is easier to maintain. In this case, we'll refer to each of these parts as **Subcontext**. It's not a new term added to the Phoenix framework but rather a term proposed to emphasize that it's a subset of Context. For this to work, we'll use delegates.
 3. Not repeat ourselves with common business logic operations. For this to work, we'll be using CRUD functions generator, since these are the most common.
+
+<br/>
 
 ### Keep contexts separate
 
@@ -79,6 +114,8 @@ And that's it. From now on, whenever you will cross-reference one context with a
 == Compilation error in file lib/app/accounts.ex ==
 ** (RuntimeError) You can't reference App.Blog context within App.Accounts context.
 ```
+
+<br/>
 
 ### Dividing each context into smaller parts
 
@@ -133,6 +170,8 @@ You will simply do:
 App.Account.find_user(1)
 ```
 
+<br/>
+
 #### Being able to access docs and specs in auto-delegated functions
 
 Both docs and specs are attached as metadata of module once it's compiled and saved as `.beam`. In reference to the example of `App.Account` context, it's possible that `App.Account.Users` will not be saved in `.beam` file before the `delegate_all` macro is executed. Therefore, first, all of the modules have to be compiled, and saved to `.beam` and only then we can create `@doc` and `@spec` of each delegated function.
@@ -144,6 +183,8 @@ config :contexted,
 ```
 
 You may also want to enable it only for certain environments, like `dev`.
+
+<br/>
 
 ### Don't repeat yourself with CRUD operations
 
@@ -180,9 +221,13 @@ iex> App.Accounts.Users.__info__(:functions)
 ]
 ```
 
+<br/>
+
 # Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+
+<br/>
 
 # License
 
