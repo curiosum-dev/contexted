@@ -115,6 +115,8 @@ And that's it. From now on, whenever you will cross-reference one context with a
 ** (RuntimeError) You can't reference App.Blog context within App.Accounts context.
 ```
 
+Read more about `Contexted.Tracer` and its options in [docs](https://hexdocs.pm/contexted/Contexted.Tracer.html).
+
 <br/>
 
 ### Dividing each context into smaller parts
@@ -184,6 +186,8 @@ config :contexted,
 
 You may also want to enable it only for certain environments, like `dev`.
 
+Read more about `Contexted.Delegator` and its options in [docs](https://hexdocs.pm/contexted/Contexted.Delegator.html).
+
 <br/>
 
 ### Don't repeat yourself with CRUD operations
@@ -220,6 +224,8 @@ iex> App.Accounts.Users.__info__(:functions)
   update_user!: 2
 ]
 ```
+
+Read more about `Contexted.CRUD` and its options in [docs](https://hexdocs.pm/contexted/Contexted.CRUD.html).
 
 <br/>
 
