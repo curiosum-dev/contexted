@@ -36,6 +36,7 @@ defmodule Contexted.CRUD do
   - `update_{resource name}!` - Updates an existing resource with the provided attributes. Raises an error if update fails.
   - `delete_{resource name}` - Deletes an existing resource. Returns an `:ok` tuple with the resource or an `:error` tuple with changeset.
   - `delete_{resource name}!` - Deletes an existing resource. Raises an error if delete fails.
+  - `change_{resource name}` - Returns changeset for given resource.
 
   {resource name} and {plural resource name} will be replaced by the singular and plural forms of the resource name.
   """
