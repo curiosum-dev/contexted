@@ -107,8 +107,7 @@ defmodule Contexted.ModuleAnalyzer do
     Enum.map_join(types, " | ", &format_type/1)
   end
 
-  defp format_type({:atom, _, nil}), do: "nil"
-  defp format_type({:atom, _, atom}), do: ":#{atom}"
+  defp format_type({:atom, _, atom}), do: ":#{Atom.to_string(atom)}"
   defp format_type({:type, _, type_name, _}), do: "#{type_name}()"
 
   defp format_type({:remote_type, _, [{:atom, _, module}, {:atom, _, type}, _list]}) do
