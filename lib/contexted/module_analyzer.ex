@@ -6,11 +6,14 @@ defmodule Contexted.ModuleAnalyzer do
   @doc """
   Fetches the `@doc` definitions for all functions within the given module.
   """
-  @spec get_module_docs(module()) :: [tuple()]
-  def get_module_docs(module) do
+  @spec get_function_docs(module()) :: [tuple()]
+  def get_function_docs(module) do
     case Code.fetch_docs(module) do
       {:docs_v1, _, _, _, _, _, functions_docs} ->
-        functions_docs
+        Enum.filter(functions_docs, fn
+          {{:function, _, _}, _, _, _, _} -> true
+          {_, _, _, _, _} -> false
+        end)
 
       _ ->
         []
@@ -51,8 +54,9 @@ defmodule Contexted.ModuleAnalyzer do
   """
   @spec get_function_doc([tuple()], atom(), non_neg_integer()) :: String.t() | nil
   def get_function_doc(functions_docs, name, arity) do
-    Enum.find(functions_docs, fn {{:function, func_name, func_arity}, _, _, _, _} ->
-      func_name == name && func_arity == arity
+    Enum.find(functions_docs, fn
+      {{:function, func_name, func_arity}, _, _, _, _} ->
+        func_name == name && func_arity == arity
     end)
     |> case do
       {_, _, _, %{"en" => doc}, _} ->
