@@ -55,8 +55,8 @@ defmodule Contexted.Delegator do
           module
       end
 
-    functions_docs = ModuleAnalyzer.get_module_docs(module)
-    functions_specs = ModuleAnalyzer.get_module_specs(module)
+    functions_docs = ModuleAnalyzer.get_functions_docs(module)
+    functions_specs = ModuleAnalyzer.get_functions_specs(module)
 
     # Get the module's public functions
     functions =

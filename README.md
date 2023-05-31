@@ -29,7 +29,7 @@ _Note: Official documentation for contexted library is [available on hexdocs][he
 
 [hexdoc]: https://hexdocs.pm/contexted
 
---- 
+---
 
 <br/>
 
@@ -62,7 +62,7 @@ Add the following to your `mix.exs` file:
 ```elixir
 defp deps do
   [
-    {:contexted, "~> 0.1.2"}
+    {:contexted, "~> 0.1.3"}
   ]
 end
 ```
@@ -74,11 +74,13 @@ Then run `mix deps.get`.
 ## Step by step overview
 
 To describe a sample usage of this library, let's assume that your project has three contexts:
+
 - `Account`
 - `Subscription`
 - `Blog`
 
 Our goal, as the project grows, is to:
+
 1. Keep contexts separate and not create any cross-references. For this to work, we'll raise errors during compilation whenever such a cross-reference happens.
 2. Divide each context into smaller parts so that it is easier to maintain. In this case, we'll refer to each of these parts as **Subcontext**. It's not a new term added to the Phoenix framework but rather a term proposed to emphasize that it's a subset of Context. For this to work, we'll use delegates.
 3. Not repeat ourselves with common business logic operations. For this to work, we'll be using CRUD functions generator, since these are the most common.
@@ -89,7 +91,8 @@ Our goal, as the project grows, is to:
 
 It's very easy to monitor cross-references between context modules with the `contexted` library.
 
-First, add `contexted` as one of the compilers in *mix.exs*:
+First, add `contexted` as one of the compilers in _mix.exs_:
+
 ```elixir
 def project do
   [
@@ -100,7 +103,8 @@ def project do
 end
 ```
 
-Next, define a list of contexts available in the app inside *config.exs*:
+Next, define a list of contexts available in the app inside _config.exs_:
+
 ```elixir
 config :contexted, contexts: [
   # list of context modules goes here, for instance:
@@ -124,6 +128,7 @@ Read more about `Contexted.Tracer` and its options in [docs](https://hexdocs.pm/
 To divide big Context into smaller Subcontexts, we can use `delegate_all/1` macro from `Contexted.Delegator` module.
 
 Let's assume that the `Account` context has `User`, `UserToken` and `Admin` resources. Here is how we can split the context module:
+
 ```elixir
 # Users subcontext
 
@@ -153,7 +158,7 @@ end
 
 defmodule App.Account do
   import Contexted.Delegator
-  
+
   delegate_all App.Account.Users
   delegate_all App.Account.UserTokens
   delegate_all App.Account.Admins
@@ -163,11 +168,13 @@ end
 From now on, you can treat the `Account` context module as the API for the "outside" world.
 
 Instead of calling:
+
 ```elixir
 App.Account.Users.find_user(1)
 ```
 
 You will simply do:
+
 ```elixir
 App.Account.find_user(1)
 ```
@@ -179,6 +186,7 @@ App.Account.find_user(1)
 Both docs and specs are attached as metadata of module once it's compiled and saved as `.beam`. In reference to the example of `App.Account` context, it's possible that `App.Account.Users` will not be saved in `.beam` file before the `delegate_all` macro is executed. Therefore, first, all of the modules have to be compiled, and saved to `.beam` and only then we can create `@doc` and `@spec` of each delegated function.
 
 As a workaround, in `Contexted.Tracer.after_compiler/1` all of the contexts `.beam` files are first deleted and then recompiled. This is an opt-in functionality, as it extends compilation time, and may produce warnings. If you want to enable it, set the following config value:
+
 ```elixir
 config :contexted,
   enable_recompilation: true
@@ -195,6 +203,7 @@ Read more about `Contexted.Delegator` and its options in [docs](https://hexdocs.
 In most web apps CRUD operations are very common. Most of these, have the same pattern. Why not autogenerate them?
 
 Here is how you can generate common CRUD operations for `App.Account.Users`:
+
 ```elixir
 defmodule App.Account.Users do
   use Contexted.CRUD,
@@ -204,6 +213,7 @@ end
 ```
 
 This will generate the following functions:
+
 ```elixir
 iex> App.Accounts.Users.__info__(:functions)
 [
