@@ -6,8 +6,8 @@ defmodule Contexted.ModuleAnalyzer do
   @doc """
   Fetches the `@doc` definitions for all functions within the given module.
   """
-  @spec get_function_docs(module()) :: [tuple()]
-  def get_function_docs(module) do
+  @spec get_functions_docs(module()) :: [tuple()]
+  def get_functions_docs(module) do
     case Code.fetch_docs(module) do
       {:docs_v1, _, _, _, _, _, functions_docs} ->
         Enum.filter(functions_docs, fn
@@ -23,8 +23,8 @@ defmodule Contexted.ModuleAnalyzer do
   @doc """
   Fetches the `@spec` definitions for all functions within the given module.
   """
-  @spec get_module_specs(module()) :: [tuple()]
-  def get_module_specs(module) do
+  @spec get_functions_specs(module()) :: [tuple()]
+  def get_functions_specs(module) do
     case Code.Typespec.fetch_specs(module) do
       {:ok, specs} -> specs
       _ -> []
