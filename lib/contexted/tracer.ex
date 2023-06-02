@@ -15,10 +15,6 @@ defmodule Contexted.Tracer do
   If so, raises an error with an appropriate message.
   """
   @spec trace(tuple(), map()) :: :ok
-  def trace({action, _line_details, module}, env) when action in [:alias_reference] do
-    verify_modules_mismatch(env.module, module)
-  end
-
   def trace({action, _meta, module, _name, _arity}, env)
       when action in [:imported_function, :remote_function, :remote_macro] do
     verify_modules_mismatch(env.module, module)
