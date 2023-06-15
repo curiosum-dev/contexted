@@ -246,7 +246,7 @@ Inside your `config.exs` you can add list of files and folders to exclude from c
 
 ```elixir
 config :contexted,
-  exclude: ["app/test", "app/lib/app/account.ex"]
+  exclude_paths: ["app/test", "app/lib/app/account.ex"]
 ```
 
 <br/>

@@ -6,7 +6,7 @@ defmodule Contexted.Tracer do
   """
 
   @contexts Application.compile_env(:contexted, :contexts, [])
-  @exclude Application.compile_env(:contexted, :exclude, [])
+  @exclude_paths Application.compile_env(:contexted, :exclude_paths, [])
 
   @doc """
   Trace events are emitted during compilation.
@@ -108,7 +108,7 @@ defmodule Contexted.Tracer do
   @spec is_file_excluded_from_check?(String.t()) :: boolean()
   defp is_file_excluded_from_check?(file) do
     Enum.any?(
-      @exclude,
+      @exclude_paths,
       &String.contains?(file, &1)
     )
   end
