@@ -6,6 +6,7 @@ defmodule Contexted.Tracer do
   """
 
   @contexts Application.compile_env(:contexted, :contexts, [])
+  @exclude Application.compile_env(:contexted, :exclude, [])
 
   @doc """
   Trace events are emitted during compilation.
@@ -17,11 +18,11 @@ defmodule Contexted.Tracer do
   @spec trace(tuple(), map()) :: :ok
   def trace({action, _meta, module, _name, _arity}, env)
       when action in [:imported_function, :remote_function, :remote_macro] do
-    verify_modules_mismatch(env.module, module)
+    verify_modules_mismatch(env.module, module, env.file)
   end
 
   def trace({action, _meta, module, _opts}, env) when action in [:require] do
-    verify_modules_mismatch(env.module, module)
+    verify_modules_mismatch(env.module, module, env.file)
   end
 
   def trace(_event, _env), do: :ok
@@ -69,23 +70,27 @@ defmodule Contexted.Tracer do
     end)
   end
 
-  @spec verify_modules_mismatch(module(), module()) :: :ok
-  defp verify_modules_mismatch(analyzed_module, referenced_module) do
-    analyzed_context_module = map_module_to_context_module(analyzed_module)
-    referenced_context_module = map_module_to_context_module(referenced_module)
-
-    if analyzed_context_module != nil and
-         referenced_context_module != nil and
-         analyzed_context_module != referenced_context_module do
-      stringed_referenced_context_module =
-        Atom.to_string(referenced_context_module) |> String.replace("Elixir.", "")
-
-      stringed_analyzed_context_module =
-        Atom.to_string(analyzed_context_module) |> String.replace("Elixir.", "")
-
-      raise "You can't reference #{stringed_referenced_context_module} context within #{stringed_analyzed_context_module} context."
-    else
+  @spec verify_modules_mismatch(module(), module(), String.t()) :: :ok
+  defp verify_modules_mismatch(analyzed_module, referenced_module, file) do
+    if is_file_excluded_from_check?(file) do
       :ok
+    else
+      analyzed_context_module = map_module_to_context_module(analyzed_module)
+      referenced_context_module = map_module_to_context_module(referenced_module)
+
+      if analyzed_context_module != nil and
+           referenced_context_module != nil and
+           analyzed_context_module != referenced_context_module do
+        stringed_referenced_context_module =
+          Atom.to_string(referenced_context_module) |> String.replace("Elixir.", "")
+
+        stringed_analyzed_context_module =
+          Atom.to_string(analyzed_context_module) |> String.replace("Elixir.", "")
+
+        raise "You can't reference #{stringed_referenced_context_module} context within #{stringed_analyzed_context_module} context."
+      else
+        :ok
+      end
     end
   end
 
@@ -98,5 +103,13 @@ defmodule Contexted.Tracer do
       String.contains?(stringified_module, stringified_context) ||
         stringified_context == stringified_module
     end)
+  end
+
+  @spec is_file_excluded_from_check?(String.t()) :: boolean()
+  defp is_file_excluded_from_check?(file) do
+    Enum.any?(
+      @exclude,
+      &String.contains?(file, &1)
+    )
   end
 end
