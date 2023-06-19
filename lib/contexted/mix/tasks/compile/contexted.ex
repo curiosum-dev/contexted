@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Compile.Contexted do
   use Mix.Task.Compiler
 
-  alias Contexted.Tracer
+  alias Contexted.{Tracer, Utils}
   alias Mix.Task.Compiler
 
   @moduledoc """
@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Compile.Contexted do
   @spec run(any()) :: :ok
   def run(_argv) do
     if Enum.count(@contexts) > 0 do
-      if recompilation_enabled?() do
+      if Utils.recompilation_enabled?() do
         Compiler.after_compiler(:app, &Tracer.after_compiler/1)
       end
 
@@ -25,10 +25,5 @@ defmodule Mix.Tasks.Compile.Contexted do
     else
       :ok
     end
-  end
-
-  @spec recompilation_enabled? :: boolean()
-  defp recompilation_enabled? do
-    Application.get_env(:contexted, :enable_recompilation)
   end
 end

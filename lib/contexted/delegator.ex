@@ -29,6 +29,7 @@ defmodule Contexted.Delegator do
         enable_recompilation: true
   """
 
+  alias Contexted.Utils
   alias Contexted.ModuleAnalyzer
 
   @doc """
@@ -75,7 +76,9 @@ defmodule Contexted.Delegator do
       Enum.map(functions, fn {name, _arity, args, doc, spec} ->
         quote do
           if unquote(doc), do: unquote(Code.string_to_quoted!(doc))
-          if unquote(spec), do: unquote(Code.string_to_quoted!(spec))
+
+          if unquote(spec) && Utils.recompilation_enabled?(),
+            do: unquote(Code.string_to_quoted!(spec))
 
           defdelegate unquote(name)(unquote_splicing(args)),
             to: unquote(module),
