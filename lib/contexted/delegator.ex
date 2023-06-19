@@ -29,8 +29,7 @@ defmodule Contexted.Delegator do
         enable_recompilation: true
   """
 
-  alias Contexted.Utils
-  alias Contexted.ModuleAnalyzer
+  alias Contexted.{ModuleAnalyzer, Utils}
 
   @doc """
   Delegates all public functions of the given module.
