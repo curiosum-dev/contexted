@@ -92,11 +92,17 @@ defmodule Contexted.Tracer do
   @spec map_module_to_context_module(module()) :: module() | nil
   defp map_module_to_context_module(module) do
     Enum.find(@contexts, fn context ->
-      stringified_context = Atom.to_string(context)
+      regex = build_regex(context)
       stringified_module = Atom.to_string(module)
 
-      String.contains?(stringified_module, stringified_context) ||
-        stringified_context == stringified_module
+      Regex.match?(regex, stringified_module)
     end)
+  end
+
+  @spec build_regex(module()) :: Regex.t()
+  defp build_regex(context) do
+    context
+    |> Atom.to_string()
+    |> then(&~r/\b#{&1}\b/)
   end
 end
