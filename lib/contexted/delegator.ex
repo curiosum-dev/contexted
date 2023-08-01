@@ -65,7 +65,7 @@ defmodule Contexted.Delegator do
       |> Enum.map(fn {name, arity} ->
         args = ModuleAnalyzer.generate_random_function_arguments(arity)
         doc = ModuleAnalyzer.get_function_doc(functions_docs, name, arity)
-        spec = ModuleAnalyzer.get_function_spec(functions_specs, name, arity)
+        spec = ModuleAnalyzer.get_function_spec(functions_specs, name, arity, module)
 
         {name, arity, args, doc, spec}
       end)
