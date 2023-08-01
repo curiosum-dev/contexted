@@ -134,5 +134,6 @@ defmodule Contexted.ModuleAnalyzer do
     end
   end
 
+  @spec is_module(String.t()) :: boolean()
   defp is_module(stringed_atom), do: String.starts_with?(stringed_atom, @module_prefix)
 end
