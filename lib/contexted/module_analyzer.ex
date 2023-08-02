@@ -3,7 +3,7 @@ defmodule Contexted.ModuleAnalyzer do
   The `Contexted.ModuleAnalyzer` defines utils functions that analyze and extract information from other modules.
   """
 
-  @module_prefix "Elixir"
+  @module_prefix "Elixir."
 
   @doc """
   Fetches the `@doc` definitions for all functions within the given module.
