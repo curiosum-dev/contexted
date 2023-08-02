@@ -37,14 +37,14 @@ defmodule Contexted.ModuleAnalyzer do
   Finds and returns the `@spec` definition in string format for the specified function name and arity.
   Returns `nil` if the function is not found in the specs.
   """
-  @spec get_function_spec([tuple()], atom(), non_neg_integer()) :: String.t() | nil
-  def get_function_spec(specs, function_name, arity) do
+  @spec get_function_spec([tuple()], atom(), non_neg_integer(), module()) :: String.t() | nil
+  def get_function_spec(specs, function_name, arity, module) do
     # Find the spec tuple in the specs
     spec = find_spec(specs, function_name, arity)
 
     # If spec is found, build the spec expression
     if spec do
-      build_spec(spec)
+      build_spec(spec, module)
     else
       nil
     end
@@ -89,11 +89,11 @@ defmodule Contexted.ModuleAnalyzer do
     end)
   end
 
-  @spec build_spec(tuple()) :: String.t()
-  defp build_spec({{function_name, _arity}, spec}) do
+  @spec build_spec(tuple(), module()) :: String.t()
+  defp build_spec({{function_name, _arity}, spec}, module) do
     {:type, _, :fun, [arg_types, return_type]} = hd(spec)
-    arg_types_string = format_arg_types(arg_types)
-    return_type_string = format_type(return_type)
+    arg_types_string = format_arg_types(arg_types, module)
+    return_type_string = format_type(return_type, module)
 
     function_with_args = "#{function_name}(#{arg_types_string})"
     return_value = return_type_string
@@ -101,19 +101,25 @@ defmodule Contexted.ModuleAnalyzer do
     "@spec #{function_with_args} :: #{return_value}"
   end
 
-  @spec format_arg_types(tuple()) :: String.t()
-  defp format_arg_types({:type, _, :product, []}), do: ""
+  @spec format_arg_types(tuple(), module()) :: String.t()
+  defp format_arg_types({:type, _, :product, []}, _module), do: ""
 
-  defp format_arg_types({:type, _, :product, arg_types}) do
-    Enum.map_join(arg_types, ",", &format_type/1)
+  defp format_arg_types({:type, _, :product, arg_types}, module) do
+    Enum.map_join(arg_types, ",", &format_type(&1, module))
   end
 
-  @spec format_type(tuple()) :: String.t()
-  defp format_type({:type, _, :union, types}) do
-    Enum.map_join(types, " | ", &format_type/1)
+  @spec format_type(tuple(), module()) :: String.t()
+  defp format_type({:type, _, :union, types}, module) do
+    Enum.map_join(types, " | ", &format_type(&1, module))
   end
 
-  defp format_type({:atom, _, atom}) do
+  defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
+
+  defp format_type({:user_type, _, atom, _}, module) do
+    "#{Atom.to_string(module)}.#{Atom.to_string(atom)}()"
+  end
+
+  defp format_type({:atom, _, atom}, _module) do
     stringed_atom = Atom.to_string(atom)
 
     if is_module(stringed_atom) do
@@ -123,10 +129,7 @@ defmodule Contexted.ModuleAnalyzer do
     end
   end
 
-  defp format_type({:type, _, type_name, _}), do: "#{type_name}()"
-  defp format_type({:user_type, _, atom, _}), do: ":#{Atom.to_string(atom)}"
-
-  defp format_type({:remote_type, _, [{:atom, _, module}, {:atom, _, type}, _list]}) do
+  defp format_type({:remote_type, _, [{:atom, _, module}, {:atom, _, type}, _list]}, _module) do
     if module == :elixir do
       "#{type}()"
     else
