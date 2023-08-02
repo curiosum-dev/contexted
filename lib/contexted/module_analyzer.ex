@@ -3,6 +3,8 @@ defmodule Contexted.ModuleAnalyzer do
   The `Contexted.ModuleAnalyzer` defines utils functions that analyze and extract information from other modules.
   """
 
+  @module_prefix "Elixir."
+
   @doc """
   Fetches the `@doc` definitions for all functions within the given module.
   """
@@ -111,7 +113,16 @@ defmodule Contexted.ModuleAnalyzer do
     Enum.map_join(types, " | ", &format_type/1)
   end
 
-  defp format_type({:atom, _, atom}), do: ":#{Atom.to_string(atom)}"
+  defp format_type({:atom, _, atom}) do
+    stringed_atom = Atom.to_string(atom)
+
+    if is_module(stringed_atom) do
+      stringed_atom
+    else
+      ":#{stringed_atom}"
+    end
+  end
+
   defp format_type({:type, _, type_name, _}), do: "#{type_name}()"
   defp format_type({:user_type, _, atom, _}), do: ":#{Atom.to_string(atom)}"
 
@@ -122,4 +133,7 @@ defmodule Contexted.ModuleAnalyzer do
       "#{module}.#{type}()"
     end
   end
+
+  @spec is_module(String.t()) :: boolean()
+  defp is_module(stringed_atom), do: String.starts_with?(stringed_atom, @module_prefix)
 end
