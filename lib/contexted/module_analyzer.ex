@@ -113,7 +113,13 @@ defmodule Contexted.ModuleAnalyzer do
     Enum.map_join(types, " | ", &format_type(&1, module))
   end
 
-  defp format_type({:atom, _, atom}) do
+  defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
+
+  defp format_type({:user_type, _, atom, _}, module) do
+    "#{Atom.to_string(module)}.#{Atom.to_string(atom)}()"
+  end
+
+  defp format_type({:atom, _, atom}, _module) do
     stringed_atom = Atom.to_string(atom)
 
     if is_module(stringed_atom) do
@@ -121,12 +127,6 @@ defmodule Contexted.ModuleAnalyzer do
     else
       ":#{stringed_atom}"
     end
-  end
-
-  defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
-
-  defp format_type({:user_type, _, atom, _}, module) do
-    "#{Atom.to_string(module)}.#{Atom.to_string(atom)}()"
   end
 
   defp format_type({:remote_type, _, [{:atom, _, module}, {:atom, _, type}, _list]}, _module) do
