@@ -8,6 +8,6 @@ defmodule Contexted.Utils do
   """
   @spec recompilation_enabled? :: boolean()
   def recompilation_enabled? do
-    Application.get_env(:contexted, :enable_recompilation)
+    Application.get_env(:contexted, :enable_recompilation, false)
   end
 end
