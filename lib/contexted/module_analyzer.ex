@@ -113,6 +113,8 @@ defmodule Contexted.ModuleAnalyzer do
     Enum.map_join(types, " | ", &format_type(&1, module))
   end
 
+  defp format_type({:type, 0, nil, []}, _module), do: "[]"
+
   defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
 
   defp format_type({:user_type, _, atom, _}, module) do
