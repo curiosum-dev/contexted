@@ -129,7 +129,8 @@ defmodule Contexted.ModuleAnalyzer do
 
   defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
 
-  defp format_type({:op, _, operator, type}, module), do: "#{operator}#{format_type(type, module)}"
+  defp format_type({:op, _, operator, type}, module),
+    do: "#{operator}#{format_type(type, module)}"
 
   defp format_type({:integer, _, integer}, _module), do: "#{integer}"
 
