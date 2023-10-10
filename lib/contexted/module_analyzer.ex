@@ -118,6 +118,12 @@ defmodule Contexted.ModuleAnalyzer do
   defp format_type({:type, _, :range, [{:integer, _, from}, {:integer, _, to}]}, _module),
     do: "#{from}..#{to}"
 
+  defp format_type({:type, _, :binary, [{:integer, _, size}, {:integer, _, 0}]}, _module),
+    do: "<<_::#{size}>>"
+
+  defp format_type({:type, _, :binary, [{:integer, _, size}, {:integer, _, unit}]}, _module),
+    do: "<<_::#{size}, _::_*#{unit}>>"
+
   defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
 
   defp format_type({:integer, _, integer}, _module), do: "#{integer}"
