@@ -115,7 +115,12 @@ defmodule Contexted.ModuleAnalyzer do
 
   defp format_type({:type, 0, nil, []}, _module), do: "[]"
 
+  defp format_type({:type, _, :range, [{:integer, _, from}, {:integer, _, to}]}, _module),
+    do: "#{from}..#{to}"
+
   defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
+
+  defp format_type({:integer, _, integer}, _module), do: "#{integer}"
 
   defp format_type({:user_type, _, atom, _}, module) do
     "#{Atom.to_string(module)}.#{Atom.to_string(atom)}()"
