@@ -104,19 +104,16 @@ defmodule Contexted.ModuleAnalyzer do
   @spec format_arg_types(tuple(), module()) :: String.t()
   defp format_arg_types({:type, _, :product, []}, _module), do: ""
 
-  defp format_arg_types({:type, _, :product, arg_types}, module) do
-    Enum.map_join(arg_types, ",", &format_type(&1, module))
-  end
+  defp format_arg_types({:type, _, :product, arg_types}, module),
+    do: join_types(arg_types, ", ", module)
 
   @spec format_type(tuple(), module()) :: String.t()
-  defp format_type({:type, _, :union, types}, module) do
-    Enum.map_join(types, " | ", &format_type(&1, module))
-  end
-
   defp format_type({:type, 0, nil, []}, _module), do: "[]"
 
-  defp format_type({:type, _, :range, [{:integer, _, from}, {:integer, _, to}]}, _module),
-    do: "#{from}..#{to}"
+  defp format_type({:type, _, :union, types}, module), do: join_types(types, " | ", module)
+
+  defp format_type({:type, _, :range, [from, to]}, module),
+    do: "#{format_type(from, module)}..#{format_type(to, module)}"
 
   defp format_type({:type, _, :binary, [{:integer, _, 0}, {:integer, _, 0}]}, _module),
     do: "<<>>"
@@ -127,32 +124,98 @@ defmodule Contexted.ModuleAnalyzer do
   defp format_type({:type, _, :binary, [{:integer, _, size}, {:integer, _, unit}]}, _module),
     do: "<<_::#{size}, _::_*#{unit}>>"
 
-  defp format_type({:type, _, type_name, _}, _module), do: "#{type_name}()"
+  defp format_type({:type, _, :list, types}, module),
+    do: "[#{join_types(types, ", ", module)}]"
+
+  defp format_type({:type, _, :nonempty_list, []}, _module),
+    do: "[...]"
+
+  defp format_type({:type, _, :nonempty_list, types}, module),
+    do: "[#{join_types(types, ", ", module)}, ...]"
+
+  defp format_type({:type, _, :tuple, types}, module),
+    do: "{#{join_types(types, ", ", module)}}"
+
+  defp format_type({:type, _, :map, types}, module),
+    do: "%{#{join_types(types, ", ", module)}}"
+
+  defp format_type({:type, _, :map_field_exact, [{:atom, _, map_key} | types]}, module),
+    do: "#{map_key}: #{join_types(types, ", ", module)}"
+
+  defp format_type({:type, _, :map_field_exact, [key_type | types]}, module),
+    do: "required(#{format_type(key_type, module)}) => #{join_types(types, ", ", module)}"
+
+  defp format_type({:type, _, :map_field_assoc, [key_type | types]}, module),
+    do: "optional(#{format_type(key_type, module)}) => #{join_types(types, ", ", module)}"
+
+  defp format_type({:type, _, :fun, [{:type, _, :any} | result_types]}, module),
+    do: "(... -> #{join_types(result_types, ", ", module)})"
+
+  defp format_type({:type, _, :fun, [{:type, _, :product, []} | result_types]}, module),
+    do: "(-> #{join_types(result_types, ", ", module)})"
+
+  defp format_type(
+         {:type, _, :fun, [{:type, _, :product, product_types} | result_types]},
+         module
+       ),
+       do:
+         "(#{join_types(product_types, ", ", module)} -> #{join_types(result_types, ", ", module)})"
+
+  defp format_type({:type, _, :fun, types}, module),
+    do: "(#{join_types(types, ", ", module)})"
+
+  defp format_type({:type, _, type_name, []}, _module), do: "#{type_name}()"
+
+  defp format_type({:type, _, type_name, types}, module),
+    do: "#{type_name}(#{join_types(types, ", ", module)})"
+
+  defp format_type({:type, _, type_name}, _module),
+    do: "#{type_name}"
 
   defp format_type({:op, _, operator, type}, module),
     do: "#{operator}#{format_type(type, module)}"
 
   defp format_type({:integer, _, integer}, _module), do: "#{integer}"
 
-  defp format_type({:user_type, _, atom, _}, module) do
-    "#{Atom.to_string(module)}.#{Atom.to_string(atom)}()"
+  defp format_type({:user_type, _, atom, _}, module),
+    do: "#{Atom.to_string(module)}.#{Atom.to_string(atom)}()"
+
+  defp format_type({:atom, _, atom}, _module), do: format_atom(atom)
+
+  defp format_type({:remote_type, _, [{:atom, _, type_module}, {:atom, _, type}, []]}, _module) do
+    if type_module == :elixir do
+      "#{type}()"
+    else
+      "#{format_atom(type_module)}.#{type}()"
+    end
   end
 
-  defp format_type({:atom, _, atom}, _module) do
+  defp format_type(
+         {:remote_type, _, [{:atom, _, type_module}, {:atom, _, type}, arg_types]},
+         module
+       ) do
+    if type_module == :elixir do
+      "#{type}(#{join_types(arg_types, ", ", module)})"
+    else
+      "#{format_atom(type_module)}.#{type}(#{join_types(arg_types, ", ", module)})"
+    end
+  end
+
+  @spec join_types([tuple()], String.t(), module()) :: String.t()
+  defp join_types([], _joiner, _module),
+    do: ""
+
+  defp join_types(types, joiner, module),
+    do: Enum.map_join(types, joiner, &format_type(&1, module))
+
+  @spec format_atom(atom()) :: String.t()
+  defp format_atom(atom) do
     stringed_atom = Atom.to_string(atom)
 
     if is_module(stringed_atom) do
       stringed_atom
     else
       ":#{stringed_atom}"
-    end
-  end
-
-  defp format_type({:remote_type, _, [{:atom, _, module}, {:atom, _, type}, _list]}, _module) do
-    if module == :elixir do
-      "#{type}()"
-    else
-      "#{module}.#{type}()"
     end
   end
 
