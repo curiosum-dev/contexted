@@ -88,12 +88,14 @@ defmodule Contexted.ModuleAnalyzer do
   end
 
   @spec build_spec(tuple()) :: String.t()
-  defp build_spec({{function_name, _arity}, spec}) do
-    first_spec = hd(spec)
-
-    Code.Typespec.spec_to_quoted(function_name, first_spec)
-    |> add_spec_ast()
-    |> Macro.to_string()
+  defp build_spec({{function_name, _arity}, specs}) do
+    specs
+    |> Enum.map(fn spec ->
+      Code.Typespec.spec_to_quoted(function_name, spec)
+      |> add_spec_ast()
+      |> Macro.to_string()
+    end)
+    |> Enum.join("\n")
   end
 
   @spec add_spec_ast(tuple()) :: tuple()
