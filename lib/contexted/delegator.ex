@@ -89,9 +89,9 @@ defmodule Contexted.Delegator do
       case Code.Typespec.fetch_types(module) do
         {:ok, types} ->
           Enum.map(types, fn
-            {:type, type} ->
+            {type_of_type, type} ->
               Code.Typespec.type_to_quoted(type)
-              |> add_type_ast()
+              |> add_ast_for_type(type_of_type)
 
             _ ->
               nil
@@ -108,11 +108,11 @@ defmodule Contexted.Delegator do
     end
   end
 
-  @spec add_type_ast(tuple()) :: tuple()
-  defp add_type_ast(ast) do
+  @spec add_ast_for_type(tuple(), atom()) :: tuple()
+  defp add_ast_for_type(ast, type_of_type) do
     {:@, [context: Elixir, imports: [{1, Kernel}]],
      [
-       {:type, [context: Elixir],
+       {type_of_type, [context: Elixir],
         [
           ast
         ]}
