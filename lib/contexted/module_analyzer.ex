@@ -94,7 +94,6 @@ defmodule Contexted.ModuleAnalyzer do
       |> add_spec_ast()
       |> Macro.to_string()
     end)
-    |> IO.inspect()
   end
 
   @spec add_spec_ast(tuple()) :: tuple()
