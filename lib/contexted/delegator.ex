@@ -65,7 +65,7 @@ defmodule Contexted.Delegator do
       |> Enum.map(fn {name, arity} ->
         args = ModuleAnalyzer.generate_random_function_arguments(arity)
         doc = ModuleAnalyzer.get_function_doc(functions_docs, name, arity)
-        spec = ModuleAnalyzer.get_function_spec(functions_specs, name, arity, module)
+        spec = ModuleAnalyzer.get_function_spec(functions_specs, name, arity)
 
         {name, arity, args, doc, spec}
       end)
@@ -85,9 +85,37 @@ defmodule Contexted.Delegator do
         end
       end)
 
+    types =
+      case Code.Typespec.fetch_types(module) do
+        {:ok, types} ->
+          Enum.map(types, fn
+            {type_of_type, type} ->
+              Code.Typespec.type_to_quoted(type)
+              |> add_ast_for_type(type_of_type)
+
+            _ ->
+              nil
+          end)
+
+        _ ->
+          []
+      end
+
     # Combine the generated delegates into a single AST
     quote do
+      (unquote_splicing(types))
       (unquote_splicing(delegates))
     end
+  end
+
+  @spec add_ast_for_type(tuple(), atom()) :: tuple()
+  defp add_ast_for_type(ast, type_of_type) do
+    {:@, [context: Elixir, imports: [{1, Kernel}]],
+     [
+       {type_of_type, [context: Elixir],
+        [
+          ast
+        ]}
+     ]}
   end
 end
