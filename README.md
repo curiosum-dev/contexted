@@ -41,8 +41,8 @@ _Note: Official documentation for contexted library is [available on hexdocs][he
   - [Keep contexts separate](#keep-contexts-separate)
   - [Dividing each context into smaller parts](#dividing-each-context-into-smaller-parts)
     - [Being able to access docs and specs in auto-delegated functions](#being-able-to-access-docs-and-specs-in-auto-delegated-functions)
+    - [Exclude files and folders from check context cross-references](#exclude-files-and-folders-from-check-context-cross-references)
   - [Don't repeat yourself with CRUD operations](#dont-repeat-yourself-with-crud-operations)
-  - [Exclude files and folders from check context cross-references](#exclude-files-and-folders-from-check-context-cross-references)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -199,6 +199,17 @@ Read more about `Contexted.Delegator` and its options in [docs](https://hexdocs.
 
 <br/>
 
+#### Exclude files and folders from check context cross-references
+
+Inside your `config.exs` you can add list of files and folders to exclude from checking context cross-references:
+
+```elixir
+config :contexted,
+  exclude_paths: ["app/test", "app/lib/app/account.ex"]
+```
+
+<br/>
+
 ### Don't repeat yourself with CRUD operations
 
 In most web apps CRUD operations are very common. Most of these, have the same pattern. Why not autogenerate them?
@@ -237,17 +248,6 @@ iex> App.Accounts.Users.__info__(:functions)
 ```
 
 Read more about `Contexted.CRUD` and its options in [docs](https://hexdocs.pm/contexted/Contexted.CRUD.html).
-
-<br/>
-
-### Exclude files and folders from check context cross-references
-
-Inside your `config.exs` you can add list of files and folders to exclude from checking context cross-references:
-
-```elixir
-config :contexted,
-  exclude_paths: ["app/test", "app/lib/app/account.ex"]
-```
 
 <br/>
 
