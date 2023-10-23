@@ -88,37 +88,22 @@ defmodule Contexted.ModuleAnalyzer do
   end
 
   @spec build_spec(tuple()) :: String.t()
-  defp build_spec({{function_name, _arity}, spec}) do
-    {:type, _, :fun, [arg_types, return_type]} = hd(spec)
-    arg_types_string = format_arg_types(arg_types)
-    return_type_string = format_type(return_type)
-
-    function_with_args = "#{function_name}(#{arg_types_string})"
-    return_value = return_type_string
-
-    "@spec #{function_with_args} :: #{return_value}"
+  defp build_spec({{function_name, _arity}, specs}) do
+    Enum.map_join(specs, "\n", fn spec ->
+      Code.Typespec.spec_to_quoted(function_name, spec)
+      |> add_spec_ast()
+      |> Macro.to_string()
+    end)
   end
 
-  @spec format_arg_types(tuple()) :: String.t()
-  defp format_arg_types({:type, _, :product, []}), do: ""
-
-  defp format_arg_types({:type, _, :product, arg_types}) do
-    Enum.map_join(arg_types, ",", &format_type/1)
-  end
-
-  @spec format_type(tuple()) :: String.t()
-  defp format_type({:type, _, :union, types}) do
-    Enum.map_join(types, " | ", &format_type/1)
-  end
-
-  defp format_type({:atom, _, atom}), do: ":#{Atom.to_string(atom)}"
-  defp format_type({:type, _, type_name, _}), do: "#{type_name}()"
-
-  defp format_type({:remote_type, _, [{:atom, _, module}, {:atom, _, type}, _list]}) do
-    if module == :elixir do
-      "#{type}()"
-    else
-      "#{module}.#{type}()"
-    end
+  @spec add_spec_ast(tuple()) :: tuple()
+  defp add_spec_ast(ast) do
+    {:@, [context: Elixir, imports: [{1, Kernel}]],
+     [
+       {:spec, [context: Elixir],
+        [
+          ast
+        ]}
+     ]}
   end
 end

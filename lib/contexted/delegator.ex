@@ -29,7 +29,7 @@ defmodule Contexted.Delegator do
         enable_recompilation: true
   """
 
-  alias Contexted.ModuleAnalyzer
+  alias Contexted.{ModuleAnalyzer, Utils}
 
   @doc """
   Delegates all public functions of the given module.
@@ -75,7 +75,9 @@ defmodule Contexted.Delegator do
       Enum.map(functions, fn {name, _arity, args, doc, spec} ->
         quote do
           if unquote(doc), do: unquote(Code.string_to_quoted!(doc))
-          if unquote(spec), do: unquote(Code.string_to_quoted!(spec))
+
+          if unquote(spec) && Utils.recompilation_enabled?(),
+            do: unquote(Code.string_to_quoted!(spec))
 
           defdelegate unquote(name)(unquote_splicing(args)),
             to: unquote(module),
@@ -83,9 +85,37 @@ defmodule Contexted.Delegator do
         end
       end)
 
+    types =
+      case Code.Typespec.fetch_types(module) do
+        {:ok, types} ->
+          Enum.map(types, fn
+            {type_of_type, type} ->
+              Code.Typespec.type_to_quoted(type)
+              |> add_ast_for_type(type_of_type)
+
+            _ ->
+              nil
+          end)
+
+        _ ->
+          []
+      end
+
     # Combine the generated delegates into a single AST
     quote do
+      (unquote_splicing(types))
       (unquote_splicing(delegates))
     end
+  end
+
+  @spec add_ast_for_type(tuple(), atom()) :: tuple()
+  defp add_ast_for_type(ast, type_of_type) do
+    {:@, [context: Elixir, imports: [{1, Kernel}]],
+     [
+       {type_of_type, [context: Elixir],
+        [
+          ast
+        ]}
+     ]}
   end
 end
