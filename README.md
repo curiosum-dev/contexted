@@ -63,7 +63,7 @@ Add the following to your `mix.exs` file:
 ```elixir
 defp deps do
   [
-    {:contexted, "~> 0.1.11"}
+    {:contexted, "~> 0.2.0"}
   ]
 end
 ```
