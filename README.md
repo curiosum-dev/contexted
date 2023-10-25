@@ -124,7 +124,7 @@ Read more about `Contexted.Tracer` and its options in [docs](https://hexdocs.pm/
 
 <br/>
 
-#### Exclude files and folders from check context cross-references
+#### Exclude files and folders from cross-references context check
 
 In special cases, you may need to exclude certain folders or files from cross-reference checks due to project structure or naming conventions. To do this, add a list of exclusions in config `exclude_paths` option:
 
