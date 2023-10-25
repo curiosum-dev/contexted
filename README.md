@@ -39,9 +39,9 @@ _Note: Official documentation for contexted library is [available on hexdocs][he
 - [Installation](#installation)
 - [Step by step overview](#step-by-step-overview)
   - [Keep contexts separate](#keep-contexts-separate)
+    - [Exclude files and folders from check context cross-references](#exclude-files-and-folders-from-check-context-cross-references)
   - [Dividing each context into smaller parts](#dividing-each-context-into-smaller-parts)
     - [Being able to access docs and specs in auto-delegated functions](#being-able-to-access-docs-and-specs-in-auto-delegated-functions)
-    - [Exclude files and folders from check context cross-references](#exclude-files-and-folders-from-check-context-cross-references)
   - [Don't repeat yourself with CRUD operations](#dont-repeat-yourself-with-crud-operations)
 - [Contributing](#contributing)
 - [License](#license)
@@ -104,7 +104,7 @@ def project do
 end
 ```
 
-Next, define a list of contexts available in the app inside _config.exs_:
+Next, define a list of contexts available in the app inside config file:
 
 ```elixir
 config :contexted, contexts: [
@@ -121,6 +121,17 @@ And that's it. From now on, whenever you will cross-reference one context with a
 ```
 
 Read more about `Contexted.Tracer` and its options in [docs](https://hexdocs.pm/contexted/Contexted.Tracer.html).
+
+<br/>
+
+#### Exclude files and folders from check context cross-references
+
+In special cases, you may need to exclude certain folders or files from cross-reference checks due to project structure or naming conventions. To do this, add a list of exclusions in config `exclude_paths` option:
+
+```elixir
+config :contexted,
+  exclude_paths: ["app/test"]
+```
 
 <br/>
 
@@ -196,17 +207,6 @@ config :contexted,
 You may also want to enable it only for certain environments, like `dev`.
 
 Read more about `Contexted.Delegator` and its options in [docs](https://hexdocs.pm/contexted/Contexted.Delegator.html).
-
-<br/>
-
-#### Exclude files and folders from check context cross-references
-
-Inside your `config.exs` you can add list of files and folders to exclude from checking context cross-references:
-
-```elixir
-config :contexted,
-  exclude_paths: ["app/test", "app/lib/app/account.ex"]
-```
 
 <br/>
 
