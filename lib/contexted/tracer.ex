@@ -5,8 +5,7 @@ defmodule Contexted.Tracer do
   This is useful when you want to ensure that certain modules do not reference each other directly within your application.
   """
 
-  @contexts Application.compile_env(:contexted, :contexts, [])
-  @exclude_paths Application.compile_env(:contexted, :exclude_paths, [])
+  alias Contexted.Utils
 
   @doc """
   Trace events are emitted during compilation.
@@ -52,7 +51,7 @@ defmodule Contexted.Tracer do
 
   @spec extract_beam_files_folder :: String.t()
   defp extract_beam_files_folder do
-    first_context = List.first(@contexts)
+    first_context = Utils.get_config_contexts() |> List.first()
     compiled_file_path = :code.which(first_context) |> List.to_string()
     compiled_file_name = Path.basename(compiled_file_path)
     String.replace(compiled_file_path, compiled_file_name, "")
@@ -60,7 +59,7 @@ defmodule Contexted.Tracer do
 
   @spec remove_context_beams_and_return_module_paths :: list(String.t())
   defp remove_context_beams_and_return_module_paths do
-    @contexts
+    Utils.get_config_contexts()
     |> Enum.map(fn module ->
       file_path = module.__info__(:compile)[:source] |> List.to_string()
 
@@ -96,7 +95,8 @@ defmodule Contexted.Tracer do
 
   @spec map_module_to_context_module(module()) :: module() | nil
   defp map_module_to_context_module(module) do
-    Enum.find(@contexts, fn context ->
+    Utils.get_config_contexts()
+    |> Enum.find(fn context ->
       regex = build_regex(context)
       stringified_module = Atom.to_string(module)
 
@@ -106,10 +106,8 @@ defmodule Contexted.Tracer do
 
   @spec is_file_excluded_from_check?(String.t()) :: boolean()
   defp is_file_excluded_from_check?(file) do
-    Enum.any?(
-      @exclude_paths,
-      &String.contains?(file, &1)
-    )
+    Utils.get_config_exclude_paths()
+    |> Enum.any?(&String.contains?(file, &1))
   end
 
   @spec build_regex(module()) :: Regex.t()
