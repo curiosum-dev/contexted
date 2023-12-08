@@ -49,7 +49,7 @@ defmodule Contexted.CRUD do
     schema = Keyword.fetch!(opts, :schema)
 
     exclude = Keyword.get(opts, :exclude, [])
-    plural_resource_name = Keyword.get(opts, :resource_plural_name, nil)
+    plural_resource_name = Keyword.get(opts, :plural_resource_name, nil)
 
     resource_name = schema |> Module.split() |> List.last() |> Macro.underscore()
 
