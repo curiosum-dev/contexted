@@ -39,7 +39,7 @@ _Note: Official documentation for contexted library is [available on hexdocs][he
 - [Installation](#installation)
 - [Step by step overview](#step-by-step-overview)
   - [Keep contexts separate](#keep-contexts-separate)
-    - [Exclude files and folders from check context cross-references](#exclude-files-and-folders-from-check-context-cross-references)
+    - [Exclude files and folders from check context cross-references](#exclude-files-and-folders-from-cross-references-context-check)
   - [Dividing each context into smaller parts](#dividing-each-context-into-smaller-parts)
     - [Being able to access docs and specs in auto-delegated functions](#being-able-to-access-docs-and-specs-in-auto-delegated-functions)
   - [Don't repeat yourself with CRUD operations](#dont-repeat-yourself-with-crud-operations)
