@@ -60,7 +60,7 @@ defmodule Contexted.ModuleAnalyzer do
     end)
     |> case do
       {_, _, _, %{"en" => doc}, _} ->
-        "@doc \"\"\"\n#{doc}\n\"\"\""
+        "@doc ~S\"\"\"\n#{doc}\n\"\"\""
 
       _ ->
         nil
