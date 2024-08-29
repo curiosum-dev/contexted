@@ -206,7 +206,7 @@ config :contexted,
 
 You may also want to enable it only for certain environments, like `dev`.
 
-*Please also note that when this functionality is enabled, during the recompliation process, warnings are temporarly silenced to avoid logging conflicts warnings. It will still log warnings as intended, during first compilation, therefore it won't have any affect on normal compilation flow.*
+*Please also note that when this functionality is enabled, during the recompilation process, warnings are temporarily silenced to avoid logging conflict warnings. It will still log warnings as intended, during the first compilation, therefore it won't have any affect on normal compilation flow.*
 
 Read more about `Contexted.Delegator` and its options in [docs](https://hexdocs.pm/contexted/Contexted.Delegator.html).
 
