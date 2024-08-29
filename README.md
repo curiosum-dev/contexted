@@ -63,7 +63,7 @@ Add the following to your `mix.exs` file:
 ```elixir
 defp deps do
   [
-    {:contexted, "~> 0.3.1"}
+    {:contexted, "~> 0.3.2"}
   ]
 end
 ```
@@ -197,7 +197,7 @@ App.Account.find_user(1)
 
 Both docs and specs are attached as metadata of module once it's compiled and saved as `.beam`. In reference to the example of `App.Account` context, it's possible that `App.Account.Users` will not be saved in `.beam` file before the `delegate_all` macro is executed. Therefore, first, all of the modules have to be compiled, and saved to `.beam` and only then we can create `@doc` and `@spec` of each delegated function.
 
-As a workaround, in `Contexted.Tracer.after_compiler/1` all of the contexts `.beam` files are first deleted and then recompiled. This is an opt-in functionality, as it extends compilation time, and may produce warnings. If you want to enable it, set the following config value:
+As a workaround, in `Contexted.Tracer.after_compiler/1` all of the contexts `.beam` files are first deleted and then recompiled. This is an opt-in functionality, as it extends compilation time. If you want to enable it, set the following config value:
 
 ```elixir
 config :contexted,
@@ -205,6 +205,8 @@ config :contexted,
 ```
 
 You may also want to enable it only for certain environments, like `dev`.
+
+*Please also note that when this functionality is enabled, during the recompliation process, warnings are temporarly silenced to avoid logging conflicts warnings. It will still log warnings as intended, during first compilation, therefore it won't have any affect on normal compilation flow.*
 
 Read more about `Contexted.Delegator` and its options in [docs](https://hexdocs.pm/contexted/Contexted.Delegator.html).
 

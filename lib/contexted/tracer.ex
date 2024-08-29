@@ -44,7 +44,9 @@ defmodule Contexted.Tracer do
     beam_files_folder = extract_beam_files_folder()
     file_paths = remove_context_beams_and_return_module_paths()
 
-    Kernel.ParallelCompiler.compile_to_path(file_paths, beam_files_folder)
+    silence_recompilation_warnings(fn ->
+      Kernel.ParallelCompiler.compile_to_path(file_paths, beam_files_folder)
+    end)
 
     {status, diagnostics}
   end
@@ -115,5 +117,21 @@ defmodule Contexted.Tracer do
     context
     |> Atom.to_string()
     |> then(&~r/\b#{&1}\b/)
+  end
+
+  @spec silence_recompilation_warnings((() -> any())) :: any()
+  defp silence_recompilation_warnings(fun) do
+    original_logger_level = Logger.level()
+    original_compiler_options = Code.compiler_options()
+
+    Logger.configure(level: :error)
+    Code.compiler_options(ignore_module_conflict: true)
+
+    try do
+      fun.()
+    after
+      Logger.configure(level: original_logger_level)
+      Code.compiler_options(original_compiler_options)
+    end
   end
 end
