@@ -197,10 +197,11 @@ App.Account.find_user(1)
 
 Both docs and specs are attached as metadata of module once it's compiled and saved as `.beam`. In reference to the example of `App.Account` context, it's possible that `App.Account.Users` will not be saved in `.beam` file before the `delegate_all` macro is executed. Therefore, first, all of the modules have to be compiled, and saved to `.beam` and only then we can create `@doc` and `@spec` of each delegated function.
 
-As a workaround, in `Contexted.Tracer.after_compiler/1` all of the contexts `.beam` files are first deleted and then recompiled. This is an opt-in functionality, as it extends compilation time. If you want to enable it, set the following config value:
+As a workaround, in `Contexted.Tracer.after_compiler/1` all of the contexts `.beam` files are first deleted and then recompiled. This is an opt-in functionality, as it extends compilation time. If you want to enable it, set the following config values:
 
 ```elixir
 config :contexted,
+  app: :your_app_name, # replace 'your_app_name' with your real app name
   enable_recompilation: true
 ```
 

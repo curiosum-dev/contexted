@@ -41,22 +41,22 @@ defmodule Contexted.Tracer do
   """
   @spec after_compiler(tuple()) :: tuple()
   def after_compiler({status, diagnostics}) do
-    beam_files_folder = extract_beam_files_folder()
     file_paths = remove_context_beams_and_return_module_paths()
+    beam_folder = get_beam_files_folder_path()
 
     silence_recompilation_warnings(fn ->
-      Kernel.ParallelCompiler.compile_to_path(file_paths, beam_files_folder)
+      Kernel.ParallelCompiler.compile_to_path(file_paths, beam_folder)
     end)
 
     {status, diagnostics}
   end
 
-  @spec extract_beam_files_folder :: String.t()
-  defp extract_beam_files_folder do
-    first_context = Utils.get_config_contexts() |> List.first()
-    compiled_file_path = :code.which(first_context) |> List.to_string()
-    compiled_file_name = Path.basename(compiled_file_path)
-    String.replace(compiled_file_path, compiled_file_name, "")
+  @spec get_beam_files_folder_path() :: String.t()
+  def get_beam_files_folder_path() do
+    build_sub_path = Mix.Project.build_path()
+    app_sub_path = Utils.get_config_app() |> Atom.to_string()
+
+    Path.join([build_sub_path, "lib", app_sub_path, "ebin"])
   end
 
   @spec remove_context_beams_and_return_module_paths :: list(String.t())
