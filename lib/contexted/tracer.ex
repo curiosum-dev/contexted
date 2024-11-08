@@ -52,7 +52,7 @@ defmodule Contexted.Tracer do
   end
 
   @spec get_beam_files_folder_path() :: String.t()
-  def get_beam_files_folder_path() do
+  def get_beam_files_folder_path do
     build_sub_path = Mix.Project.build_path()
     app_sub_path = Utils.get_config_app() |> Atom.to_string()
 
