@@ -70,7 +70,8 @@ defmodule Contexted.CRUD do
         @doc """
         Returns a list of all #{plural_resource_name} from the database.
 
-        If a query is provided, it will be used to fetch the #{plural_resource_name}.
+        If an `Ecto.Query` or the schema module is provided, it will be used to fetch the #{plural_resource_name}.
+        Note that this argument does not take any arbitrary queryable, but only `Ecto.Query` or the specific schema module of the resource.
 
         If a list of preloads is provided, it will be used to preload the #{plural_resource_name}.
         Preloads can be an atom or a list of atoms.
@@ -90,10 +91,19 @@ defmodule Contexted.CRUD do
             iex> list_#{plural_resource_name}([:associated])
             [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
         """
-        @spec unquote(function_name)(keyword() | atom() | Ecto.Query.t(), keyword() | atom()) :: [
+        @spec unquote(function_name)(keyword() | atom() | Ecto.Queryable.t(), keyword() | atom()) :: [
                 %unquote(schema){}
               ]
-        def unquote(function_name)(query_or_preloads \\ [], preloads \\ [])
+        def unquote(function_name)(queryable_or_preloads \\ [], preloads \\ [])
+
+        def unquote(function_name)(
+          queryable,
+          preloads
+        ) when queryable == unquote(schema) and (is_list(preloads) or is_atom(preloads)) do
+          queryable
+          |> unquote(repo).all()
+          |> unquote(repo).preload(preloads)
+        end
 
         def unquote(function_name)(preloads, []) when is_list(preloads) or is_atom(preloads) do
           unquote(schema)
@@ -110,6 +120,8 @@ defmodule Contexted.CRUD do
           |> unquote(repo).all()
           |> unquote(repo).preload(preloads)
         end
+
+
       end
 
       unless :get in exclude do
