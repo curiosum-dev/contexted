@@ -70,15 +70,45 @@ defmodule Contexted.CRUD do
         @doc """
         Returns a list of all #{plural_resource_name} from the database.
 
+        If a query is provided, it will be used to fetch the #{plural_resource_name}.
+
+        If a list of preloads is provided, it will be used to preload the #{plural_resource_name}.
+        Preloads can be an atom or a list of atoms.
+
+
         ## Examples
 
             iex> list_#{plural_resource_name}()
             [%#{Macro.camelize(resource_name)}{}, ...]
+
+            iex> list_#{plural_resource_name}(from r in #{schema}, limit: 10)
+            [%#{Macro.camelize(resource_name)}{}, ...]
+
+            iex> list_#{plural_resource_name}(query, [:associated])
+            [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
+
+            iex> list_#{plural_resource_name}([:associated])
+            [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
         """
-        @spec unquote(function_name)() :: [%unquote(schema){}]
-        def unquote(function_name)() do
+        @spec unquote(function_name)(keyword() | atom() | Ecto.Query.t(), keyword() | atom()) :: [
+                %unquote(schema){}
+              ]
+        def unquote(function_name)(query_or_preloads \\ [], preloads \\ [])
+
+        def unquote(function_name)(preloads, []) when is_list(preloads) or is_atom(preloads) do
           unquote(schema)
           |> unquote(repo).all()
+          |> unquote(repo).preload(preloads)
+        end
+
+        def unquote(function_name)(
+              %Ecto.Query{from: %{source: {_, unquote(schema)}}} = query,
+              preloads
+            )
+            when is_list(preloads) or is_atom(preloads) do
+          query
+          |> unquote(repo).all()
+          |> unquote(repo).preload(preloads)
         end
       end
 
