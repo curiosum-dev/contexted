@@ -91,15 +91,17 @@ defmodule Contexted.CRUD do
             iex> list_#{plural_resource_name}([:associated])
             [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
         """
-        @spec unquote(function_name)(keyword() | atom() | Ecto.Queryable.t(), keyword() | atom()) :: [
-                %unquote(schema){}
-              ]
+        @spec unquote(function_name)(keyword() | atom() | Ecto.Queryable.t(), keyword() | atom()) ::
+                [
+                  %unquote(schema){}
+                ]
         def unquote(function_name)(queryable_or_preloads \\ [], preloads \\ [])
 
         def unquote(function_name)(
-          queryable,
-          preloads
-        ) when queryable == unquote(schema) and (is_list(preloads) or is_atom(preloads)) do
+              queryable,
+              preloads
+            )
+            when queryable == unquote(schema) and (is_list(preloads) or is_atom(preloads)) do
           queryable
           |> unquote(repo).all()
           |> unquote(repo).preload(preloads)
@@ -120,8 +122,6 @@ defmodule Contexted.CRUD do
           |> unquote(repo).all()
           |> unquote(repo).preload(preloads)
         end
-
-
       end
 
       unless :get in exclude do

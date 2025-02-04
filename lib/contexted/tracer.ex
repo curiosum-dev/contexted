@@ -119,7 +119,7 @@ defmodule Contexted.Tracer do
     |> then(&~r/\b#{&1}\b/)
   end
 
-  @spec silence_recompilation_warnings((() -> any())) :: any()
+  @spec silence_recompilation_warnings((-> any())) :: any()
   defp silence_recompilation_warnings(fun) do
     original_logger_level = Logger.level()
     original_compiler_options = Code.compiler_options()
