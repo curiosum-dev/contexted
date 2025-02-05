@@ -1,6 +1,46 @@
 defmodule Contexted.QueryBuilder do
+  @moduledoc """
+  Builds queries based on conditions defined as keyword lists.
+
+  ## Example
+
+  ```elixir
+  query = Contexted.QueryBuilder.build_query(MyApp.Inventory.Item, [
+    part_number: "1234567890",
+    category: "electronics",
+    manufacturer: [name: "Acme"]
+  ])
+
+  # This will generate the following query:
+  #
+  # from i in MyApp.Inventory.Item,
+  #   join: m in assoc(i, :manufacturer),
+  #   where: i.category == "electronics" and m.name == "Acme" and i.part_number == "1234567890"
+  ```
+  """
   import Ecto.Query
 
+  @doc """
+  Builds a query based on the given schema and conditions.
+
+  Automatically joins associations based on the conditions.
+
+  ## Example
+
+  ```elixir
+  query = Contexted.QueryBuilder.build_query(MyApp.Inventory.Item, [
+    part_number: "1234567890",
+    category: "electronics",
+    manufacturer: [name: "Acme"]
+  ])
+
+  # This will generate the following query:
+  #
+  # from i in MyApp.Inventory.Item,
+  #   join: m in assoc(i, :manufacturer),
+  #   where: i.category == "electronics" and m.name == "Acme" and i.part_number == "1234567890"
+  ```
+  """
   def build_query(schema, conditions) do
     from(r in schema)
     |> traverse_conditions(conditions, [])
