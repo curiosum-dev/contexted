@@ -39,13 +39,18 @@ defmodule Contexted.QueryBuilder do
   end
 
   defp join_or_where(query, {field, value}, parent_path) do
-    case parent_path do
-      [] ->
+    case {parent_path, value} do
+      {[], nil} ->
+        from r in query, where: is_nil(field(r, ^field))
+
+      {[], _} ->
         from r in query, where: field(r, ^field) == ^value
 
-      _path ->
-        from [{^join_parent_path(parent_path), r}] in query,
-          where: field(r, ^field) == ^value
+      {_path, nil} ->
+        from [{^join_parent_path(parent_path), r}] in query, where: is_nil(field(r, ^field))
+
+      {_path, _} ->
+        from [{^join_parent_path(parent_path), r}] in query, where: field(r, ^field) == ^value
     end
   end
 
