@@ -239,6 +239,7 @@ defmodule Contexted.CRUD do
             %#{Macro.camelize(resource_name)}{} or nil
         """
 
+        @spec unquote(function_name)(Ecto.Queryable.t(), keyword()) :: %unquote(schema){}
         def unquote(function_name)(query, opts)
             when is_struct(query, Ecto.Query) or is_atom(query) do
           # One arg: get resource based on the query
@@ -247,6 +248,7 @@ defmodule Contexted.CRUD do
           |> maybe_preload(opts[:preload])
         end
 
+        @spec unquote(function_name)(map() | keyword()) :: %unquote(schema){}
         def unquote(function_name)(conditions_and_opts)
             when is_list(conditions_and_opts) or is_map(conditions_and_opts) do
           # One arg: get resource with conditions and preloads
@@ -260,6 +262,7 @@ defmodule Contexted.CRUD do
           |> maybe_preload(opts[:preload])
         end
 
+        @spec unquote(function_name)(map() | keyword(), keyword()) :: %unquote(schema){}
         def unquote(function_name)(conditions, preloads) when is_list(preloads) do
           # Two args: get resource with separate conditions and preloads
           build_query(unquote(schema), conditions)
@@ -274,7 +277,7 @@ defmodule Contexted.CRUD do
 
         See get_#{resource_name}_by/2 for more details on arguments and options.
         """
-
+        @spec unquote(function_name)(Ecto.Queryable.t(), keyword()) :: %unquote(schema){}
         def unquote(function_name)(query, opts)
             when is_struct(query, Ecto.Query) or is_atom(query) do
           # One arg: get resource based on the query
@@ -283,6 +286,7 @@ defmodule Contexted.CRUD do
           |> maybe_preload(opts[:preload])
         end
 
+        @spec unquote(function_name)(map() | keyword()) :: %unquote(schema){}
         def unquote(function_name)(conditions_and_opts)
             when is_list(conditions_and_opts) or is_map(conditions_and_opts) do
           # One arg: get resource with conditions and preloads
@@ -296,6 +300,7 @@ defmodule Contexted.CRUD do
           |> maybe_preload(opts[:preload])
         end
 
+        @spec unquote(function_name)(map() | keyword(), keyword()) :: %unquote(schema){}
         def unquote(function_name)(conditions, preloads) when is_list(preloads) do
           # Two args: get resource with separate conditions and preloads
           build_query(unquote(schema), conditions)
