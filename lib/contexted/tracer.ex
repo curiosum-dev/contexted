@@ -73,7 +73,7 @@ defmodule Contexted.Tracer do
 
   @spec verify_modules_mismatch(module(), module(), String.t()) :: :ok
   defp verify_modules_mismatch(analyzed_module, referenced_module, file) do
-    if is_file_excluded_from_check?(file) do
+    if file_excluded_from_check?(file) do
       :ok
     else
       analyzed_context_module = map_module_to_context_module(analyzed_module)
@@ -106,8 +106,8 @@ defmodule Contexted.Tracer do
     end)
   end
 
-  @spec is_file_excluded_from_check?(String.t()) :: boolean()
-  defp is_file_excluded_from_check?(file) do
+  @spec file_excluded_from_check?(String.t()) :: boolean()
+  defp file_excluded_from_check?(file) do
     Utils.get_config_exclude_paths()
     |> Enum.any?(&String.contains?(file, &1))
   end
