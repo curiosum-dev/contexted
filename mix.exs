@@ -26,7 +26,8 @@ defmodule Contexted.MixProject do
     [
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.25", only: :dev, runtime: false},
-      {:versioce, "~> 2.0.0", only: :dev, runtime: false}
+      {:versioce, "~> 2.0.0", only: :dev, runtime: false},
+      {:ecto, "~> 3.0"}
     ]
   end
 
