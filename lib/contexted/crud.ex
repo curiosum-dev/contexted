@@ -64,6 +64,8 @@ defmodule Contexted.CRUD do
             resource_name: resource_name,
             plural_resource_name: plural_resource_name
           ] do
+      import Contexted.QueryBuilder
+
       unless :list in exclude do
         function_name = String.to_atom("list_#{plural_resource_name}")
 
@@ -91,7 +93,10 @@ defmodule Contexted.CRUD do
             iex> list_#{plural_resource_name}([:associated])
             [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
         """
-        @spec unquote(function_name)(keyword() | atom() | Ecto.Queryable.t(), keyword() | atom()) ::
+        @spec unquote(function_name)(
+                keyword() | atom() | Ecto.Queryable.t() | list(),
+                keyword() | atom()
+              ) ::
                 [
                   %unquote(schema){}
                 ]
@@ -103,6 +108,15 @@ defmodule Contexted.CRUD do
             )
             when queryable == unquote(schema) and (is_list(preloads) or is_atom(preloads)) do
           queryable
+          |> unquote(repo).all()
+          |> unquote(repo).preload(preloads)
+        end
+
+        def unquote(function_name)(conditions, preloads)
+            when is_list(conditions) and (is_list(preloads) or is_atom(preloads)) do
+          query = build_query(unquote(schema), conditions)
+
+          query
           |> unquote(repo).all()
           |> unquote(repo).preload(preloads)
         end
@@ -142,8 +156,10 @@ defmodule Contexted.CRUD do
             %#{Macro.camelize(resource_name)}{associated: ...} or nil
         """
 
-        @spec unquote(function_name)(integer() | String.t(), keyword() | atom()) :: %unquote(schema){} | nil
-        def unquote(function_name)(id, preloads \\ []) when is_list(preloads) or is_atom(preloads) do
+        @spec unquote(function_name)(integer() | String.t(), keyword() | atom()) ::
+                %unquote(schema){} | nil
+        def unquote(function_name)(id, preloads \\ [])
+            when is_list(preloads) or is_atom(preloads) do
           unquote(schema)
           |> unquote(repo).get(id)
           |> case do
@@ -169,8 +185,11 @@ defmodule Contexted.CRUD do
             %#{Macro.camelize(resource_name)}{associated: ...} or raises Ecto.NoResultsError
         """
 
-        @spec unquote(function_name)(integer() | String.t(), keyword() | atom()) :: %unquote(schema){}
-        def unquote(function_name)(id, preloads \\ []) when is_list(preloads) or is_atom(preloads) do
+        @spec unquote(function_name)(integer() | String.t(), keyword() | atom()) :: %unquote(
+                schema
+              ){}
+        def unquote(function_name)(id, preloads \\ [])
+            when is_list(preloads) or is_atom(preloads) do
           unquote(schema)
           |> unquote(repo).get!(id)
           |> unquote(repo).preload(preloads)
@@ -181,21 +200,41 @@ defmodule Contexted.CRUD do
         function_name = String.to_atom("get_#{resource_name}_by")
 
         @doc """
-        Retrieves a single #{resource_name} by an Ecto.Query from the database. Returns nil if the #{resource_name} is not found.
+        Retrieves a single #{resource_name} by either an Ecto.Query or a map/keyword list of conditions from the database. Returns nil if the #{resource_name} is not found.
 
         If a list of preloads is provided, it will be used to preload the #{resource_name}.
         Preloads can be an atom or a list of atoms.
 
         ## Examples
 
-            iex> get_#{resource_name}_by(from r in #{schema}, where: r.status == "active")
+            iex> get_#{resource_name}_by(%{status: "active"})
             %#{Macro.camelize(resource_name)}{} or nil
 
-              iex> get_#{resource_name}_by(from r in #{schema}, where: r.status == "active", [:associated])
+            iex> get_#{resource_name}_by([status: "active"], [:associated])
             %#{Macro.camelize(resource_name)}{associated: ...} or nil
+
+            iex> get_#{resource_name}_by(from r in #{schema}, where: r.status == "active")
+            %#{Macro.camelize(resource_name)}{} or nil
         """
-        @spec unquote(function_name)(Ecto.Queryable.t(), keyword() | atom()) :: %unquote(schema){} | nil
-        def unquote(function_name)(queryable, preloads \\ []) when is_list(preloads) or is_atom(preloads) do
+        @spec unquote(function_name)(Ecto.Queryable.t() | map() | keyword(), keyword() | atom()) ::
+                %unquote(schema){} | nil
+        def unquote(function_name)(query_or_conditions, preloads \\ [])
+
+        def unquote(function_name)(query_or_conditions, preloads)
+            when (is_map(query_or_conditions) or is_list(query_or_conditions)) and
+                   (is_list(preloads) or is_atom(preloads)) do
+          query = build_query(unquote(schema), query_or_conditions)
+
+          query
+          |> unquote(repo).one()
+          |> case do
+            nil -> nil
+            record -> unquote(repo).preload(record, preloads)
+          end
+        end
+
+        def unquote(function_name)(queryable, preloads)
+            when is_list(preloads) or is_atom(preloads) do
           queryable
           |> unquote(repo).one()
           |> case do
@@ -207,21 +246,38 @@ defmodule Contexted.CRUD do
         function_name = String.to_atom("get_#{resource_name}_by!")
 
         @doc """
-        Retrieves a single #{resource_name} by an Ecto.Query from the database. Raises an error if the #{resource_name} is not found.
+        Retrieves a single #{resource_name} by either an Ecto.Query or a map/keyword list of conditions from the database. Raises an error if the #{resource_name} is not found.
 
         If a list of preloads is provided, it will be used to preload the #{resource_name}.
         Preloads can be an atom or a list of atoms.
 
         ## Examples
 
-            iex> get_#{resource_name}_by!(from r in #{schema}, where: r.status == "active")
+            iex> get_#{resource_name}_by!(%{status: "active"})
             %#{Macro.camelize(resource_name)}{} or raises Ecto.NoResultsError
 
-            iex> get_#{resource_name}_by!(from r in #{schema}, where: r.status == "active", [:associated])
+            iex> get_#{resource_name}_by!([status: "active"], [:associated])
             %#{Macro.camelize(resource_name)}{associated: ...} or raises Ecto.NoResultsError
+
+            iex> get_#{resource_name}_by!(from r in #{schema}, where: r.status == "active")
+            %#{Macro.camelize(resource_name)}{} or raises Ecto.NoResultsError
         """
-        @spec unquote(function_name)(Ecto.Queryable.t(), keyword() | atom()) :: %unquote(schema){}
-        def unquote(function_name)(queryable, preloads \\ []) when is_list(preloads) or is_atom(preloads) do
+        @spec unquote(function_name)(Ecto.Queryable.t() | map() | keyword(), keyword() | atom()) ::
+                %unquote(schema){}
+        def unquote(function_name)(query_or_conditions, preloads \\ [])
+
+        def unquote(function_name)(query_or_conditions, preloads)
+            when (is_map(query_or_conditions) or is_list(query_or_conditions)) and
+                   (is_list(preloads) or is_atom(preloads)) do
+          query = build_query(unquote(schema), query_or_conditions)
+
+          query
+          |> unquote(repo).one!()
+          |> unquote(repo).preload(preloads)
+        end
+
+        def unquote(function_name)(queryable, preloads)
+            when is_list(preloads) or is_atom(preloads) do
           queryable
           |> unquote(repo).one!()
           |> unquote(repo).preload(preloads)
