@@ -72,12 +72,21 @@ defmodule Contexted.CRUD do
         @doc """
         Returns a list of all #{plural_resource_name} from the database.
 
-        If an `Ecto.Query` or the schema module is provided, it will be used to fetch the #{plural_resource_name}.
-        Note that this argument does not take any arbitrary queryable, but only `Ecto.Query` or the specific schema module of the resource.
+        ## Arguments
 
-        If a list of preloads is provided, it will be used to preload the #{plural_resource_name}.
-        Preloads can be an atom or a list of atoms.
+        The function accepts several argument patterns:
 
+        - No arguments: Returns all records
+        - Single argument:
+          - `Ecto.Query` or schema module: Uses this as the base query
+          - Keyword list: Used as conditions and options (e.g. preload)
+        - Two arguments:
+          - Query + options: Uses query and applies options like preloads
+          - Conditions + preloads: Applies conditions and preloads separately
+
+        ## Options
+
+        - `:preload` - Preloads associations. Can be an atom or list of atoms.
 
         ## Examples
 
@@ -87,52 +96,49 @@ defmodule Contexted.CRUD do
             iex> list_#{plural_resource_name}(from r in #{schema}, limit: 10)
             [%#{Macro.camelize(resource_name)}{}, ...]
 
-            iex> list_#{plural_resource_name}(query, [:associated])
+            iex> list_#{plural_resource_name}(preload: :associated)
             [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
 
-            iex> list_#{plural_resource_name}([:associated])
+            iex> list_#{plural_resource_name}([status: :active], preload: [:associated])
+            [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
+
+            iex> list_#{plural_resource_name}(query, preload: [:associated])
             [%#{Macro.camelize(resource_name)}{associated: ...}, ...]
         """
-        @spec unquote(function_name)(
-                keyword() | atom() | Ecto.Queryable.t() | list(),
-                keyword() | atom()
-              ) ::
-                [
-                  %unquote(schema){}
-                ]
-        def unquote(function_name)(queryable_or_preloads \\ [], preloads \\ [])
 
-        def unquote(function_name)(
-              queryable,
-              preloads
-            )
-            when queryable == unquote(schema) and (is_list(preloads) or is_atom(preloads)) do
-          queryable
+        def unquote(function_name)() do
+          # No args: list all resources based on the schema
+          unquote(schema)
           |> unquote(repo).all()
-          |> unquote(repo).preload(preloads)
+        end
+
+        def unquote(function_name)(query) when is_struct(query, Ecto.Query) or is_atom(query) do
+          # One arg: list all resources based on the query
+          query
+          |> unquote(repo).all()
+        end
+
+        def unquote(function_name)(conditions_and_opts) do
+          # One arg: list all resources based on the query
+          {opts, conditions} = Keyword.split(conditions_and_opts, [:preload])
+
+          build_query(unquote(schema), conditions)
+          |> unquote(repo).all()
+          |> unquote(repo).preload(opts[:preload] || [])
+        end
+
+        def unquote(function_name)(query, opts)
+            when (is_struct(query, Ecto.Query) or is_atom(query)) and is_list(opts) do
+          # Two args: list all resources based on the query and opts
+          query
+          |> unquote(repo).all()
+          |> unquote(repo).preload(opts[:preload] || [])
         end
 
         def unquote(function_name)(conditions, preloads)
-            when is_list(conditions) and (is_list(preloads) or is_atom(preloads)) do
-          query = build_query(unquote(schema), conditions)
-
-          query
-          |> unquote(repo).all()
-          |> unquote(repo).preload(preloads)
-        end
-
-        def unquote(function_name)(preloads, []) when is_list(preloads) or is_atom(preloads) do
+            when is_list(conditions) and is_list(preloads) do
+          # Two args: list all resources based on the preloads
           unquote(schema)
-          |> unquote(repo).all()
-          |> unquote(repo).preload(preloads)
-        end
-
-        def unquote(function_name)(
-              %Ecto.Query{from: %{source: {_, unquote(schema)}}} = query,
-              preloads
-            )
-            when is_list(preloads) or is_atom(preloads) do
-          query
           |> unquote(repo).all()
           |> unquote(repo).preload(preloads)
         end
@@ -199,88 +205,102 @@ defmodule Contexted.CRUD do
       unless :get_by in exclude do
         function_name = String.to_atom("get_#{resource_name}_by")
 
+        defp maybe_preload(nil, _preload), do: nil
+        defp maybe_preload(record, nil), do: record
+        defp maybe_preload(record, preload), do: unquote(repo).preload(record, preload)
+
         @doc """
         Retrieves a single #{resource_name} by either an Ecto.Query or a map/keyword list of conditions from the database. Returns nil if the #{resource_name} is not found.
 
-        If a list of preloads is provided, it will be used to preload the #{resource_name}.
-        Preloads can be an atom or a list of atoms.
+        ## Arguments
+
+        The function accepts several argument patterns:
+
+        - Single argument:
+          - `Ecto.Query` or schema module: Uses this as the base query
+          - Keyword list or map: Used as conditions and options (e.g. preload)
+        - Two arguments:
+          - Query + options: Uses query and applies options like preloads
+          - Conditions + options: Applies conditions and options separately
+
+        ## Options
+
+        - `:preload` - Preloads associations. Can be an atom or list of atoms.
 
         ## Examples
 
             iex> get_#{resource_name}_by(%{status: "active"})
             %#{Macro.camelize(resource_name)}{} or nil
 
-            iex> get_#{resource_name}_by([status: "active"], [:associated])
+            iex> get_#{resource_name}_by([status: "active"], preload: :associated)
             %#{Macro.camelize(resource_name)}{associated: ...} or nil
 
             iex> get_#{resource_name}_by(from r in #{schema}, where: r.status == "active")
             %#{Macro.camelize(resource_name)}{} or nil
         """
-        @spec unquote(function_name)(Ecto.Queryable.t() | map() | keyword(), keyword() | atom()) ::
-                %unquote(schema){} | nil
-        def unquote(function_name)(query_or_conditions, preloads \\ [])
 
-        def unquote(function_name)(query_or_conditions, preloads)
-            when (is_map(query_or_conditions) or is_list(query_or_conditions)) and
-                   (is_list(preloads) or is_atom(preloads)) do
-          query = build_query(unquote(schema), query_or_conditions)
-
+        def unquote(function_name)(query, opts)
+            when is_struct(query, Ecto.Query) or is_atom(query) do
+          # One arg: get resource based on the query
           query
           |> unquote(repo).one()
-          |> case do
-            nil -> nil
-            record -> unquote(repo).preload(record, preloads)
-          end
+          |> maybe_preload(opts[:preload])
         end
 
-        def unquote(function_name)(queryable, preloads)
-            when is_list(preloads) or is_atom(preloads) do
-          queryable
+        def unquote(function_name)(conditions_and_opts)
+            when is_list(conditions_and_opts) or is_map(conditions_and_opts) do
+          # One arg: get resource with conditions and preloads
+          {opts, conditions} =
+            if is_list(conditions_and_opts),
+              do: Keyword.split(conditions_and_opts, [:preload]),
+              else: {[], conditions_and_opts}
+
+          build_query(unquote(schema), conditions)
           |> unquote(repo).one()
-          |> case do
-            nil -> nil
-            record -> unquote(repo).preload(record, preloads)
-          end
+          |> maybe_preload(opts[:preload])
+        end
+
+        def unquote(function_name)(conditions, preloads) when is_list(preloads) do
+          # Two args: get resource with separate conditions and preloads
+          build_query(unquote(schema), conditions)
+          |> unquote(repo).one()
+          |> maybe_preload(preloads[:preload])
         end
 
         function_name = String.to_atom("get_#{resource_name}_by!")
 
         @doc """
-        Retrieves a single #{resource_name} by either an Ecto.Query or a map/keyword list of conditions from the database. Raises an error if the #{resource_name} is not found.
+        Similar to get_#{resource_name}_by/2 but raises Ecto.NoResultsError if no result is found.
 
-        If a list of preloads is provided, it will be used to preload the #{resource_name}.
-        Preloads can be an atom or a list of atoms.
-
-        ## Examples
-
-            iex> get_#{resource_name}_by!(%{status: "active"})
-            %#{Macro.camelize(resource_name)}{} or raises Ecto.NoResultsError
-
-            iex> get_#{resource_name}_by!([status: "active"], [:associated])
-            %#{Macro.camelize(resource_name)}{associated: ...} or raises Ecto.NoResultsError
-
-            iex> get_#{resource_name}_by!(from r in #{schema}, where: r.status == "active")
-            %#{Macro.camelize(resource_name)}{} or raises Ecto.NoResultsError
+        See get_#{resource_name}_by/2 for more details on arguments and options.
         """
-        @spec unquote(function_name)(Ecto.Queryable.t() | map() | keyword(), keyword() | atom()) ::
-                %unquote(schema){}
-        def unquote(function_name)(query_or_conditions, preloads \\ [])
 
-        def unquote(function_name)(query_or_conditions, preloads)
-            when (is_map(query_or_conditions) or is_list(query_or_conditions)) and
-                   (is_list(preloads) or is_atom(preloads)) do
-          query = build_query(unquote(schema), query_or_conditions)
-
+        def unquote(function_name)(query, opts)
+            when is_struct(query, Ecto.Query) or is_atom(query) do
+          # One arg: get resource based on the query
           query
           |> unquote(repo).one!()
-          |> unquote(repo).preload(preloads)
+          |> maybe_preload(opts[:preload])
         end
 
-        def unquote(function_name)(queryable, preloads)
-            when is_list(preloads) or is_atom(preloads) do
-          queryable
+        def unquote(function_name)(conditions_and_opts)
+            when is_list(conditions_and_opts) or is_map(conditions_and_opts) do
+          # One arg: get resource with conditions and preloads
+          {opts, conditions} =
+            if is_list(conditions_and_opts),
+              do: Keyword.split(conditions_and_opts, [:preload]),
+              else: {[], conditions_and_opts}
+
+          build_query(unquote(schema), conditions)
           |> unquote(repo).one!()
-          |> unquote(repo).preload(preloads)
+          |> maybe_preload(opts[:preload])
+        end
+
+        def unquote(function_name)(conditions, preloads) when is_list(preloads) do
+          # Two args: get resource with separate conditions and preloads
+          build_query(unquote(schema), conditions)
+          |> unquote(repo).one!()
+          |> maybe_preload(preloads[:preload])
         end
       end
 
