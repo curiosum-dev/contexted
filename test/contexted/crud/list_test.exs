@@ -38,6 +38,46 @@ defmodule Contexted.CRUD.ListTest do
                |> MapSet.new()
     end
 
+    test "list_items(subcategory: [name: \"Subcategory 1.1\"])", %{items: items} do
+      loaded_items = ItemContext.list_items(subcategory: [name: "Subcategory 1.1"])
+
+      assert loaded_items |> length ==
+               items |> Enum.count(&String.starts_with?(&1.name, "Item 1.1."))
+
+      assert loaded_items
+             |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 1.1.") end)
+    end
+
+    test "list_items(subcategory: [category: [name: \"Category 1\"]])", %{items: items} do
+      loaded_items =
+        ItemContext.list_items(subcategory: [category: [name: "Category 2"]])
+
+      assert loaded_items |> length ==
+               items |> Enum.count(&String.starts_with?(&1.name, "Item 2."))
+
+      assert loaded_items
+             |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 2.") end)
+    end
+
+    test "list_items(subcategory_id: 1, preload: [subcategory: :category])", %{
+      items: items,
+      subcategories: [subcategory1 | _]
+    } do
+      loaded_items =
+        ItemContext.list_items(subcategory_id: subcategory1.id, preload: [subcategory: :category])
+
+      assert loaded_items |> length ==
+               items |> Enum.count(&String.starts_with?(&1.name, "Item 1.1."))
+
+      assert loaded_items
+             |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 1.1.") end)
+
+      assert loaded_items
+             |> Enum.all?(fn item -> item.subcategory.category.name == "Category 1" end)
+    end
+  end
+
+  describe "list_*/2" do
     test "list_items(Ecto.Query.t(), preload: :subcategory)", %{items: items} do
       loaded_items =
         ItemContext.list_items(
@@ -103,44 +143,6 @@ defmodule Contexted.CRUD.ListTest do
 
       assert loaded_items
              |> Enum.all?(fn item -> item.subcategory.name == "Subcategory 1.2" end)
-
-      assert loaded_items
-             |> Enum.all?(fn item -> item.subcategory.category.name == "Category 1" end)
-    end
-
-    test "list_items(subcategory: [name: \"Subcategory 1.1\"])", %{items: items} do
-      loaded_items = ItemContext.list_items(subcategory: [name: "Subcategory 1.1"])
-
-      assert loaded_items |> length ==
-               items |> Enum.count(&String.starts_with?(&1.name, "Item 1.1."))
-
-      assert loaded_items
-             |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 1.1.") end)
-    end
-
-    test "list_items(subcategory: [category: [name: \"Category 1\"]])", %{items: items} do
-      loaded_items =
-        ItemContext.list_items(subcategory: [category: [name: "Category 2"]])
-
-      assert loaded_items |> length ==
-               items |> Enum.count(&String.starts_with?(&1.name, "Item 2."))
-
-      assert loaded_items
-             |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 2.") end)
-    end
-
-    test "list_items(subcategory_id: 1, preload: [subcategory: :category])", %{
-      items: items,
-      subcategories: [subcategory1 | _]
-    } do
-      loaded_items =
-        ItemContext.list_items(subcategory_id: subcategory1.id, preload: [subcategory: :category])
-
-      assert loaded_items |> length ==
-               items |> Enum.count(&String.starts_with?(&1.name, "Item 1.1."))
-
-      assert loaded_items
-             |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 1.1.") end)
 
       assert loaded_items
              |> Enum.all?(fn item -> item.subcategory.category.name == "Category 1" end)
