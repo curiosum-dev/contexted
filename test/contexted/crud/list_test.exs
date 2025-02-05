@@ -3,6 +3,7 @@ defmodule Contexted.CRUD.ListTest do
   doctest Contexted.CRUD
 
   alias Contexted.TestApp.Item
+  alias Contexted.TestApp.Contexts.{CategoryContext, SubcategoryContext, ItemContext}
 
   import Contexted.TestRecords
   import Ecto.Query
@@ -11,31 +12,26 @@ defmodule Contexted.CRUD.ListTest do
 
   describe "list_*/0" do
     test "list_categories/0", %{categories: categories} do
-      assert Contexted.TestApp.Contexts.CategoryContext.list_categories() |> MapSet.new() ==
-               categories |> MapSet.new()
+      assert CategoryContext.list_categories() |> MapSet.new() == categories |> MapSet.new()
     end
 
     test "list_subcategories/0", %{subcategories: subcategories} do
-      assert Contexted.TestApp.Contexts.SubcategoryContext.list_subcategories() |> MapSet.new() ==
+      assert SubcategoryContext.list_subcategories() |> MapSet.new() ==
                subcategories |> MapSet.new()
     end
 
     test "list_items/0", %{items: items} do
-      assert Contexted.TestApp.Contexts.ItemContext.list_items() |> MapSet.new() ==
-               items |> MapSet.new()
+      assert ItemContext.list_items() |> MapSet.new() == items |> MapSet.new()
     end
   end
 
   describe "list_*/1" do
     test "list_items(%Item{})", %{items: items} do
-      assert Contexted.TestApp.Contexts.ItemContext.list_items(Contexted.TestApp.Item)
-             |> MapSet.new() == items |> MapSet.new()
+      assert ItemContext.list_items(Item) |> MapSet.new() == items |> MapSet.new()
     end
 
     test "list_items(Ecto.Query.t())", %{items: items} do
-      assert Contexted.TestApp.Contexts.ItemContext.list_items(
-               from(i in Item, where: like(i.name, "Item 1.2.%"))
-             )
+      assert ItemContext.list_items(from(i in Item, where: like(i.name, "Item 1.2.%")))
              |> MapSet.new() ==
                items
                |> Enum.filter(&String.starts_with?(&1.name, "Item 1.2."))
@@ -44,7 +40,7 @@ defmodule Contexted.CRUD.ListTest do
 
     test "list_items(Ecto.Query.t(), preload: :subcategory)", %{items: items} do
       loaded_items =
-        Contexted.TestApp.Contexts.ItemContext.list_items(
+        ItemContext.list_items(
           from(i in Item, where: like(i.name, "Item 1.2.%"), preload: :subcategory)
         )
 
@@ -60,7 +56,7 @@ defmodule Contexted.CRUD.ListTest do
 
     test "list_items(Ecto.Query.t(), preload: [:subcategory])", %{items: items} do
       loaded_items =
-        Contexted.TestApp.Contexts.ItemContext.list_items(
+        ItemContext.list_items(
           from(i in Item, where: like(i.name, "Item 1.2.%"), preload: [:subcategory])
         )
 
@@ -76,7 +72,7 @@ defmodule Contexted.CRUD.ListTest do
 
     test "list_items(Ecto.Query.t(), preload: [subcategory: :category])", %{items: items} do
       loaded_items =
-        Contexted.TestApp.Contexts.ItemContext.list_items(
+        ItemContext.list_items(
           from(i in Item, where: like(i.name, "Item 1.2.%"), preload: [subcategory: :category])
         )
 
@@ -95,7 +91,7 @@ defmodule Contexted.CRUD.ListTest do
 
     test "list_items(Ecto.Query.t(), preload: [subcategory: [:category]])", %{items: items} do
       loaded_items =
-        Contexted.TestApp.Contexts.ItemContext.list_items(
+        ItemContext.list_items(
           from(i in Item, where: like(i.name, "Item 1.2.%"), preload: [subcategory: :category])
         )
 
@@ -113,8 +109,7 @@ defmodule Contexted.CRUD.ListTest do
     end
 
     test "list_items(subcategory: [name: \"Subcategory 1.1\"])", %{items: items} do
-      loaded_items =
-        Contexted.TestApp.Contexts.ItemContext.list_items(subcategory: [name: "Subcategory 1.1"])
+      loaded_items = ItemContext.list_items(subcategory: [name: "Subcategory 1.1"])
 
       assert loaded_items |> length ==
                items |> Enum.count(&String.starts_with?(&1.name, "Item 1.1."))
@@ -125,15 +120,30 @@ defmodule Contexted.CRUD.ListTest do
 
     test "list_items(subcategory: [category: [name: \"Category 1\"]])", %{items: items} do
       loaded_items =
-        Contexted.TestApp.Contexts.ItemContext.list_items(
-          subcategory: [category: [name: "Category 2"]]
-        )
+        ItemContext.list_items(subcategory: [category: [name: "Category 2"]])
 
       assert loaded_items |> length ==
                items |> Enum.count(&String.starts_with?(&1.name, "Item 2."))
 
       assert loaded_items
              |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 2.") end)
+    end
+
+    test "list_items(subcategory_id: 1, preload: [subcategory: :category])", %{
+      items: items,
+      subcategories: [subcategory1 | _]
+    } do
+      loaded_items =
+        ItemContext.list_items(subcategory_id: subcategory1.id, preload: [subcategory: :category])
+
+      assert loaded_items |> length ==
+               items |> Enum.count(&String.starts_with?(&1.name, "Item 1.1."))
+
+      assert loaded_items
+             |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 1.1.") end)
+
+      assert loaded_items
+             |> Enum.all?(fn item -> item.subcategory.category.name == "Category 1" end)
     end
   end
 end
