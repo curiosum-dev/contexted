@@ -3,7 +3,7 @@ defmodule Contexted.CRUD.ListTest do
   doctest Contexted.CRUD
 
   alias Contexted.TestApp.Item
-  alias Contexted.TestApp.Contexts.{CategoryContext, SubcategoryContext, ItemContext}
+  alias Contexted.TestApp.Contexts.{CategoryContext, ItemContext, SubcategoryContext}
 
   import Contexted.TestRecords
   import Ecto.Query
@@ -38,7 +38,7 @@ defmodule Contexted.CRUD.ListTest do
                |> MapSet.new()
     end
 
-    test "list_items(subcategory: [name: \"Subcategory 1.1\"])", %{items: items} do
+    test ~s{list_items(subcategory: [name: "Subcategory 1.1"])}, %{items: items} do
       loaded_items = ItemContext.list_items(subcategory: [name: "Subcategory 1.1"])
 
       assert loaded_items |> length ==
@@ -48,7 +48,7 @@ defmodule Contexted.CRUD.ListTest do
              |> Enum.all?(fn item -> String.starts_with?(item.name, "Item 1.1.") end)
     end
 
-    test "list_items(subcategory: [category: [name: \"Category 1\"]])", %{items: items} do
+    test ~s{list_items(subcategory: [category: [name: "Category 1"]])}, %{items: items} do
       loaded_items =
         ItemContext.list_items(subcategory: [category: [name: "Category 2"]])
 

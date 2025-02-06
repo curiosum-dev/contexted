@@ -1,8 +1,9 @@
 defmodule Contexted.TestRecords do
+  @moduledoc false
   alias Contexted.TestApp.Category
-  alias Contexted.TestApp.Subcategory
   alias Contexted.TestApp.Item
   alias Contexted.TestApp.Repo
+  alias Contexted.TestApp.Subcategory
 
   def test_records(context) do
     [category1, category2] =

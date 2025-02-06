@@ -1,4 +1,5 @@
 defmodule Contexted.TestApp.Item do
+  @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
 

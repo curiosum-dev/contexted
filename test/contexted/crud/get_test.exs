@@ -2,7 +2,7 @@ defmodule Contexted.CRUD.GetTest do
   use Contexted.DataCase
   doctest Contexted.CRUD
 
-  alias Contexted.TestApp.{Item, Category, Subcategory}
+  alias Contexted.TestApp.{Category, Item, Subcategory}
   alias Contexted.TestApp.Contexts.ItemContext
 
   import Contexted.TestRecords

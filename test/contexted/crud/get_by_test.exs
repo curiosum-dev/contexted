@@ -2,7 +2,7 @@ defmodule Contexted.CRUD.GetByTest do
   use Contexted.DataCase
   doctest Contexted.CRUD
 
-  alias Contexted.TestApp.{Item, Category, Subcategory}
+  alias Contexted.TestApp.{Category, Item, Subcategory}
   alias Contexted.TestApp.Contexts.ItemContext
 
   import Contexted.TestRecords
@@ -10,17 +10,17 @@ defmodule Contexted.CRUD.GetByTest do
   setup [:test_records]
 
   describe "get_*_by/1" do
-    test "get_item_by(name: \"Item 1.1.1\")", %{items: items} do
+    test ~s{get_item_by(name: "Item 1.1.1")}, %{items: items} do
       assert ItemContext.get_item_by(name: "Item 1.1.1") ==
                items |> Enum.find(&(&1.name == "Item 1.1.1"))
     end
 
-    test "get_item_by(name: \"Item 1.1.1\", preload: :subcategory)" do
+    test ~s{get_item_by(name: "Item 1.1.1", preload: :subcategory)} do
       assert %Item{subcategory: %Subcategory{name: "Subcategory 1.1"}} =
                ItemContext.get_item_by(name: "Item 1.1.1", preload: :subcategory)
     end
 
-    test "get_item_by(name: \"Item 1.1.1\", preload: [subcategory: :category])" do
+    test ~s{get_item_by(name: "Item 1.1.1", preload: [subcategory: :category])} do
       assert %Item{
                subcategory: %Subcategory{
                  name: "Subcategory 1.1",
@@ -30,7 +30,7 @@ defmodule Contexted.CRUD.GetByTest do
                ItemContext.get_item_by(name: "Item 1.1.1", preload: [subcategory: :category])
     end
 
-    test "get_item_by(from(i in Item, where: like(i.name, \"Item 1.1.%\") and i.serial_number == \"1234567890\"))" do
+    test ~s{get_item_by(from(i in Item, where: like(i.name, "Item 1.1.%") and i.serial_number == "1234567890"))} do
       assert %Item{name: "Item 1.1.1"} =
                ItemContext.get_item_by(
                  from(i in Item,
@@ -39,24 +39,24 @@ defmodule Contexted.CRUD.GetByTest do
                )
     end
 
-    test "get_item_by(from(i in Item, where: i.serial_number == \"nonexistent\"))" do
+    test ~s{get_item_by(from(i in Item, where: i.serial_number == "nonexistent"))} do
       assert nil ==
                ItemContext.get_item_by(from(i in Item, where: i.serial_number == "nonexistent"))
     end
   end
 
   describe("get_*_by!/1") do
-    test "get_item_by!(name: \"Item 1.1.1\")", %{items: items} do
+    test ~s{get_item_by!(name: "Item 1.1.1")}, %{items: items} do
       assert ItemContext.get_item_by!(name: "Item 1.1.1") ==
                items |> Enum.find(&(&1.name == "Item 1.1.1"))
     end
 
-    test "get_item_by!(name: \"Item 1.1.1\", preload: :subcategory)" do
+    test ~s{get_item_by!(name: "Item 1.1.1", preload: :subcategory)} do
       assert %Item{subcategory: %Subcategory{name: "Subcategory 1.1"}} =
                ItemContext.get_item_by!(name: "Item 1.1.1", preload: :subcategory)
     end
 
-    test "get_item_by!(name: \"Item 1.1.1\", preload: [subcategory: :category])" do
+    test ~s{get_item_by!(name: "Item 1.1.1", preload: [subcategory: :category])} do
       assert %Item{
                subcategory: %Subcategory{
                  name: "Subcategory 1.1",
@@ -66,7 +66,7 @@ defmodule Contexted.CRUD.GetByTest do
                ItemContext.get_item_by!(name: "Item 1.1.1", preload: [subcategory: :category])
     end
 
-    test "get_item_by!(from(i in Item, where: like(i.name, \"Item 1.1.%\") and i.serial_number == \"1234567890\"))" do
+    test ~s{get_item_by!(from(i in Item, where: like(i.name, "Item 1.1.%") and i.serial_number == "1234567890"))} do
       assert %Item{name: "Item 1.1.1"} =
                ItemContext.get_item_by!(
                  from(i in Item,
@@ -83,7 +83,7 @@ defmodule Contexted.CRUD.GetByTest do
   end
 
   describe("get_*_by/2") do
-    test "get_item_by(from(i in Item, where: like(i.name, \"Item 1.1.%\") and i.serial_number == \"1234567890\"), preload: [subcategory: :category])" do
+    test ~s{get_item_by(from(i in Item, where: like(i.name, "Item 1.1.%") and i.serial_number == "1234567890"), preload: [subcategory: :category])} do
       assert %Item{
                name: "Item 1.1.1",
                subcategory: %Subcategory{
@@ -101,7 +101,7 @@ defmodule Contexted.CRUD.GetByTest do
   end
 
   describe("get_*_by!/2") do
-    test "get_item_by!(from(i in Item, where: like(i.name, \"Item 1.1.%\") and i.serial_number == \"1234567890\"), preload: [subcategory: :category])" do
+    test ~s{get_item_by!(from(i in Item, where: like(i.name, "Item 1.1.%") and i.serial_number == "1234567890"), preload: [subcategory: :category])} do
       assert %Item{
                name: "Item 1.1.1",
                subcategory: %Subcategory{
