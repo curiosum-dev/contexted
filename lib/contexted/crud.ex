@@ -158,19 +158,18 @@ defmodule Contexted.CRUD do
             iex> get_#{resource_name}(id)
             %#{Macro.camelize(resource_name)}{} or nil
 
-            iex> get_#{resource_name}(id, [:associated])
+            iex> get_#{resource_name}(id, preload: [:associated])
             %#{Macro.camelize(resource_name)}{associated: ...} or nil
         """
 
         @spec unquote(function_name)(integer() | String.t(), keyword() | atom()) ::
                 %unquote(schema){} | nil
-        def unquote(function_name)(id, preloads \\ [])
-            when is_list(preloads) or is_atom(preloads) do
+        def unquote(function_name)(id, opts \\ []) when is_list(opts) do
           unquote(schema)
           |> unquote(repo).get(id)
           |> case do
             nil -> nil
-            record -> unquote(repo).preload(record, preloads)
+            record -> unquote(repo).preload(record, opts[:preload] || [])
           end
         end
 
