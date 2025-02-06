@@ -242,10 +242,17 @@ defmodule Contexted.CRUD do
         @spec unquote(function_name)(Ecto.Queryable.t(), keyword()) :: %unquote(schema){}
         def unquote(function_name)(query, opts)
             when is_struct(query, Ecto.Query) or is_atom(query) do
-          # One arg: get resource based on the query
+          # Two args: get resource based on the query, with preloads
           query
           |> unquote(repo).one()
           |> maybe_preload(opts[:preload])
+        end
+
+        @spec unquote(function_name)(Ecto.Queryable.t()) :: %unquote(schema){}
+        def unquote(function_name)(query) when is_struct(query, Ecto.Query) or is_atom(query) do
+          # One arg: get resource based on the query
+          query
+          |> unquote(repo).one()
         end
 
         @spec unquote(function_name)(map() | keyword()) :: %unquote(schema){}
@@ -280,10 +287,17 @@ defmodule Contexted.CRUD do
         @spec unquote(function_name)(Ecto.Queryable.t(), keyword()) :: %unquote(schema){}
         def unquote(function_name)(query, opts)
             when is_struct(query, Ecto.Query) or is_atom(query) do
-          # One arg: get resource based on the query
+          # Two args: get resource based on the query, with preloads
           query
           |> unquote(repo).one!()
           |> maybe_preload(opts[:preload])
+        end
+
+        @spec unquote(function_name)(Ecto.Queryable.t()) :: %unquote(schema){}
+        def unquote(function_name)(query) when is_struct(query, Ecto.Query) or is_atom(query) do
+          # One arg: get resource based on the query
+          query
+          |> unquote(repo).one!()
         end
 
         @spec unquote(function_name)(map() | keyword()) :: %unquote(schema){}
