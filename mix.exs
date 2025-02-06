@@ -1,6 +1,9 @@
 defmodule Contexted.MixProject do
   use Mix.Project
 
+  @version "0.3.3"
+  @source_url "https://github.com/curiosum-dev/contexted"
+
   def project do
     [
       app: :contexted,
@@ -10,7 +13,8 @@ defmodule Contexted.MixProject do
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package()
+      package: package(),
+      docs: docs()
     ]
   end
 
@@ -34,8 +38,20 @@ defmodule Contexted.MixProject do
     [
       licenses: ["MIT"],
       maintainers: ["Curiosum"],
-      links: %{"GitHub" => "https://github.com/curiosum-dev/contexted"},
+      links: %{"GitHub" => @source_url},
       files: ~w(lib mix.exs README.md LICENSE)
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_ref: "v#{@version}",
+      source_url: @source_url,
+      extras: ["README.md"]
+      # groups_for_extras: [
+      #   "Getting Started": ~r/README\.md/
+      # ]
     ]
   end
 end
