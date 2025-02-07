@@ -215,7 +215,8 @@ Read more about `Contexted.Delegator` and its options in [docs](https://hexdocs.
 
 ### Don't repeat yourself with CRUD operations
 
-In most web apps CRUD operations are very common. Most of these, have the same pattern. Why not autogenerate them?
+In most web apps CRUD operations are very common. Most of these, have the same pattern. Most of the time, they are used with preloading associated resources as well as filtering based on conditions such as search, pagination, etc.
+Why not autogenerate them?
 
 Here is how you can generate common CRUD operations for `App.Account.Users`:
 
@@ -242,13 +243,21 @@ iex> App.Accounts.Users.__info__(:functions)
   delete_user!: 1,
   get_user: 1,
   get_user!: 1,
+  get_user_by: 1,
+  get_user_by!: 1,
+  get_user_by: 2,
+  get_user_by!: 2,
   list_users: 0,
+  list_users: 1,
+  list_users: 2,
   update_user: 1,
   update_user: 2,
   update_user!: 1,
   update_user!: 2
 ]
 ```
+
+Generated creation and updating functions default to the corresponding schema's `changeset/1` and `changeset/2` functions, respectively, whereas list and get functions provide a means to quickly specify filtering conditions (via plain exact match condition lists or by passing an Ecto.Query) and preloads.
 
 Read more about `Contexted.CRUD` and its options in [docs](https://hexdocs.pm/contexted/Contexted.CRUD.html).
 
