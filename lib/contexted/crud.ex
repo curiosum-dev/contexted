@@ -274,14 +274,6 @@ defmodule Contexted.CRUD do
           |> maybe_preload(opts[:preload])
         end
 
-        @spec unquote(function_name)(map() | keyword(), keyword()) :: %unquote(schema){}
-        def unquote(function_name)(conditions, preloads) when is_list(preloads) do
-          # Two args: get resource with separate conditions and preloads
-          build_query(unquote(schema), conditions)
-          |> unquote(repo).one()
-          |> maybe_preload(preloads[:preload])
-        end
-
         function_name = String.to_atom("get_#{resource_name}_by!")
 
         @doc """
@@ -338,14 +330,6 @@ defmodule Contexted.CRUD do
           build_query(unquote(schema), conditions)
           |> unquote(repo).one!()
           |> maybe_preload(opts[:preload])
-        end
-
-        @spec unquote(function_name)(map() | keyword(), keyword()) :: %unquote(schema){}
-        def unquote(function_name)(conditions, preloads) when is_list(preloads) do
-          # Two args: get resource with separate conditions and preloads
-          build_query(unquote(schema), conditions)
-          |> unquote(repo).one!()
-          |> maybe_preload(preloads[:preload])
         end
       end
 
