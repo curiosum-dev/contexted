@@ -257,7 +257,45 @@ iex> App.Accounts.Users.__info__(:functions)
 ]
 ```
 
-Generated creation and updating functions default to the corresponding schema's `changeset/1` and `changeset/2` functions, respectively, whereas list and get functions provide a means to quickly specify filtering conditions (via plain exact match condition lists or by passing an Ecto.Query) and preloads.
+Generated creation and updating functions default to the corresponding schema's `changeset/1` and `changeset/2` functions, respectively, whereas list and get functions provide a means to manipulate the result by:
+
+* filtering conditions (via plain exact match condition lists or by passing an Ecto.Query)
+* preloads
+* orderings
+* limits
+* offsets
+
+Examples:
+
+```elixir
+# List all users with posts preloaded
+iex> App.Accounts.Users.list_users(preload: [:posts])
+
+# Use an Ecto.Query to filter users, and a keyword list of options to manipulate the result
+iex> App.Accounts.Users.list_users(
+  App.Accounts.User |> where([u], u.status == "active"),
+  preload: [:posts],
+  order_by: [desc: :inserted_at],
+  limit: 10,
+  offset: 0
+)
+
+# Use a keyword list of exact match conditions and manipulation options
+iex> App.Accounts.Users.list_users(
+  status: "active",
+  subscription: [plan: "free"],
+  order_by: [desc: :inserted_at]
+)
+
+# Get a user by ID with subscription preloaded
+iex> App.Accounts.Users.get_user!(10, preload: [:subscription])
+
+# Get a user by profile email with profile and subscription preloaded
+iex> App.Accounts.Users.get_user_by!(profile: [email: "user@example.com"], preload: [:profile, :subscription])
+
+# Use an Ecto.Query to get a specific user
+iex> App.Accounts.Users.get_user_by!(App.Accounts.User |> where([u], u.id == 10), preload: [:profile, :subscription])
+```
 
 Read more about `Contexted.CRUD` and its options in [docs](https://hexdocs.pm/contexted/Contexted.CRUD.html).
 

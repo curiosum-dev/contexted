@@ -41,8 +41,17 @@ defmodule Contexted.QueryBuilder do
   #   where: i.category == "electronics" and m.name == "Acme" and i.part_number == "1234567890"
   ```
   """
-  def build_query(schema, conditions) do
+  def build_query(schema, conditions, opts \\ [])
+
+  def build_query(schema, conditions, opts) when is_map(conditions) do
+    build_query(schema, Map.to_list(conditions), opts)
+  end
+
+  def build_query(schema, conditions, opts) do
     from(r in schema)
+    |> then(&if opts[:order_by], do: order_by(&1, ^opts[:order_by]), else: &1)
+    |> then(&if opts[:limit], do: limit(&1, ^opts[:limit]), else: &1)
+    |> then(&if opts[:offset], do: offset(&1, ^opts[:offset]), else: &1)
     |> traverse_conditions(conditions, [])
   end
 

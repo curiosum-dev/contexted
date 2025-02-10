@@ -67,9 +67,12 @@ defmodule Contexted.CRUD do
             plural_resource_name: plural_resource_name
           ] do
       import Contexted.QueryBuilder
+      import Ecto.Query
 
       unless :list in exclude do
         function_name = String.to_atom("list_#{plural_resource_name}")
+
+        @opt_keys [:preload, :order_by, :limit, :offset]
 
         @doc """
         Returns a list of all #{plural_resource_name} from the database.
@@ -121,9 +124,9 @@ defmodule Contexted.CRUD do
 
         def unquote(function_name)(conditions_and_opts) do
           # One arg: list all resources based on the query
-          {opts, conditions} = Keyword.split(conditions_and_opts, [:preload])
+          {opts, conditions} = Keyword.split(conditions_and_opts, @opt_keys)
 
-          build_query(unquote(schema), conditions)
+          build_query(unquote(schema), conditions, opts)
           |> unquote(repo).all()
           |> unquote(repo).preload(opts[:preload] || [])
         end
@@ -131,7 +134,7 @@ defmodule Contexted.CRUD do
         def unquote(function_name)(query, opts)
             when (is_struct(query, Ecto.Query) or is_atom(query)) and is_list(opts) do
           # Two args: list all resources based on the query and opts
-          query
+          build_query(query, [], opts)
           |> unquote(repo).all()
           |> unquote(repo).preload(opts[:preload] || [])
         end
@@ -266,10 +269,10 @@ defmodule Contexted.CRUD do
           # One arg: get resource with conditions and preloads
           {opts, conditions} =
             if is_list(conditions_and_opts),
-              do: Keyword.split(conditions_and_opts, [:preload]),
+              do: Keyword.split(conditions_and_opts, @opt_keys),
               else: {[], conditions_and_opts}
 
-          build_query(unquote(schema), conditions)
+          build_query(unquote(schema), conditions, opts)
           |> unquote(repo).one()
           |> maybe_preload(opts[:preload])
         end
@@ -324,10 +327,10 @@ defmodule Contexted.CRUD do
           # One arg: get resource with conditions and preloads
           {opts, conditions} =
             if is_list(conditions_and_opts),
-              do: Keyword.split(conditions_and_opts, [:preload]),
+              do: Keyword.split(conditions_and_opts, @opt_keys),
               else: {[], conditions_and_opts}
 
-          build_query(unquote(schema), conditions)
+          build_query(unquote(schema), conditions, opts)
           |> unquote(repo).one!()
           |> maybe_preload(opts[:preload])
         end

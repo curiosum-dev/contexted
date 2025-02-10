@@ -43,6 +43,30 @@ defmodule Contexted.CRUD.GetByTest do
       assert nil ==
                ItemContext.get_item_by(from(i in Item, where: i.serial_number == "nonexistent"))
     end
+
+    test "get_item_by with empty conditions raises Ecto.MultipleResultsError" do
+      assert_raise Ecto.MultipleResultsError, fn ->
+        ItemContext.get_item_by(%{})
+      end
+    end
+
+    test "get_item_by with non-unique condition raises Ecto.MultipleResultsError", %{
+      subcategories: [subcategory1 | _]
+    } do
+      assert_raise Ecto.MultipleResultsError, fn ->
+        ItemContext.get_item_by(subcategory_id: subcategory1.id)
+      end
+    end
+
+    test "get_item_by with high offset returns nil" do
+      assert nil == ItemContext.get_item_by(name: "Item 1.1.1", offset: 100)
+    end
+
+    test "get_item_by with unknown field raises an error" do
+      assert_raise Ecto.QueryError, fn ->
+        ItemContext.get_item_by(foo: "bar")
+      end
+    end
   end
 
   describe("get_*_by!/1") do
@@ -78,6 +102,18 @@ defmodule Contexted.CRUD.GetByTest do
     test "get_item_by!(from(i in Item, where: i.serial_number == \"nonexistent\"))" do
       assert_raise Ecto.NoResultsError, fn ->
         ItemContext.get_item_by!(from(i in Item, where: i.serial_number == "nonexistent"))
+      end
+    end
+
+    test "get_item_by! with empty conditions raises Ecto.MultipleResultsError" do
+      assert_raise Ecto.MultipleResultsError, fn ->
+        ItemContext.get_item_by!(%{})
+      end
+    end
+
+    test "get_item_by! with high offset raises Ecto.NoResultsError" do
+      assert_raise Ecto.NoResultsError, fn ->
+        ItemContext.get_item_by!(name: "Item 1.1.1", offset: 1)
       end
     end
   end
@@ -116,5 +152,29 @@ defmodule Contexted.CRUD.GetByTest do
                  preload: [subcategory: :category]
                )
     end
+  end
+
+  test "get_item_by with order, limit, and offset", %{subcategories: [subcategory1 | _]} do
+    item =
+      ItemContext.get_item_by(
+        subcategory_id: subcategory1.id,
+        order_by: [desc: :name],
+        limit: 1,
+        offset: 1
+      )
+
+    assert item.name == "Item 1.1.1"
+  end
+
+  test "get_item_by! with order, limit, and offset", %{subcategories: [subcategory1 | _]} do
+    item =
+      ItemContext.get_item_by!(
+        subcategory_id: subcategory1.id,
+        order_by: [desc: :name],
+        limit: 1,
+        offset: 1
+      )
+
+    assert item.name == "Item 1.1.1"
   end
 end
