@@ -2,6 +2,7 @@ defmodule Contexted.TestApp.Subcategory do
   @moduledoc false
   use Ecto.Schema
   import Ecto.Changeset
+  import Ecto.Schema
 
   schema "subcategories" do
     field :name, :string
