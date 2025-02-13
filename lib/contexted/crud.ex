@@ -72,7 +72,7 @@ defmodule Contexted.CRUD do
       unless :list in exclude do
         function_name = String.to_atom("list_#{plural_resource_name}")
 
-        @opt_keys [:preload, :order_by, :limit, :offset]
+        @opt_keys [:preload, :order_by, :limit, :offset, :count]
 
         @doc """
         Returns a list of all #{plural_resource_name} from the database.

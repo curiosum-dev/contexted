@@ -19,6 +19,7 @@ defmodule Contexted.QueryBuilder do
   ```
   """
   import Ecto.Query
+  import __MODULE__.Counter
 
   @doc """
   Builds a query based on the given schema and conditions.
@@ -52,6 +53,7 @@ defmodule Contexted.QueryBuilder do
     |> then(&if opts[:order_by], do: order_by(&1, ^opts[:order_by]), else: &1)
     |> then(&if opts[:limit], do: limit(&1, ^opts[:limit]), else: &1)
     |> then(&if opts[:offset], do: offset(&1, ^opts[:offset]), else: &1)
+    |> then(&if opts[:count], do: add_counts(&1, opts[:count]), else: &1)
     |> traverse_conditions(conditions, [])
   end
 
