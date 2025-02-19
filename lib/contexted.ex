@@ -185,8 +185,6 @@ defmodule Contexted do
   This will generate the following functions:
 
   ```
-  ```elixir
-  iex> App.Accounts.Users.__info__(:functions)
   [
     change_user: 1,
     change_user: 2,
@@ -204,7 +202,6 @@ defmodule Contexted do
     update_user!: 1,
     update_user!: 2
   ]
-  ```
   ```
 
   See more in [Contexted.CRUD](https://hexdocs.pm/contexted/Contexted.CRUD.html).
