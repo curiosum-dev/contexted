@@ -17,6 +17,12 @@ defmodule Contexted.Utils do
   def get_config_contexts, do: get_from_config(:contexts, [])
 
   @doc """
+  Returns `context_options` option value from contexted config or `[]` if it's not set.
+  """
+  @spec get_config_context_options :: Keyword.t()
+  def get_config_context_options, do: get_from_config(:context_options, [])
+
+  @doc """
   Returns `exclude_paths` option value from contexted config or [] if it's not set.
   """
   @spec get_config_exclude_paths :: list(String.t())
