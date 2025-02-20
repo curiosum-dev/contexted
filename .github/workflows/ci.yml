@@ -29,6 +29,13 @@ jobs:
         elixir-version: ${{ env.elixir_version }}
         otp-version: ${{ env.otp_version }}
 
+    - name: Set up Postgres
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql
+        sudo service postgresql start
+        sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+
     - name: Restore dependencies and _build cache
       uses: actions/cache@v2
       with:
@@ -47,6 +54,11 @@ jobs:
 
     - name: Check formatting
       run: mix format --check-formatted
+
+    - name: Create test database
+      run: mix do ecto.create, ecto.migrate
+      env:
+        MIX_ENV: test
 
     - name: Run tests
       run: mix test
