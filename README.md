@@ -1,6 +1,23 @@
-# Contexted
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/f0352656-397d-4d90-999a-d3adbae1095f">
+
+  <h1>Contexted</h1>
+  <p><strong>Tools for clean, maintainable Elixir & Phoenix contexts</strong></p>
+
+  [![Contact Us](https://img.shields.io/badge/Contact%20Us-%23F36D2E?style=for-the-badge&logo=maildotru&logoColor=white&labelColor=F36D2E)](https://curiosum.com/contact)
+  [![Visit Curiosum](https://img.shields.io/badge/Visit%20Curiosum-%236819E6?style=for-the-badge&logo=elixir&logoColor=white&labelColor=6819E6)](https://curiosum.com/services/elixir-software-development)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-1D0642?style=for-the-badge&logo=open-source-initiative&logoColor=white&labelColor=1D0642)](https://github.com/curiosum-dev/contexted/blob/main/LICENSE)
+</div>
+
 
 <br/>
+
+## 📦 Short overview
+
+[Contexts](https://hexdocs.pm/phoenix/contexts.html) in Elixir & Phoenix are getting complicated over time.
+Cross-referencing, big modules and repetitiveness are the most common reasons for this problem.
+
+Contexted arms you with a set of tools to maintain contexts well.
 
 <div>
   <a href="https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml">
@@ -16,13 +33,6 @@
 
 <br/>
 
-[Contexts](https://hexdocs.pm/phoenix/contexts.html) in Elixir & Phoenix are getting complicated over time.
-Cross-referencing, big modules and repetitiveness are the most common reasons for this problem.
-
-Contexted arms you with a set of tools to maintain contexts well.
-
-<br/>
-
 ---
 
 _Note: Official documentation for contexted library is [available on hexdocs][hexdoc]._
@@ -33,7 +43,7 @@ _Note: Official documentation for contexted library is [available on hexdocs][he
 
 <br/>
 
-## Table of Contents
+## 📚 Table of Contents
 
 - [Features](#features)
 - [Installation](#installation)
@@ -48,7 +58,7 @@ _Note: Official documentation for contexted library is [available on hexdocs][he
 
 <br/>
 
-## Features
+## ✨ Features
 
 - `Contexted.Tracer` - trace and enforce definite separation between specific context modules.
 - `Contexted.Delegator` - divide the big context module into smaller parts and use delegations to build the final context.
@@ -56,7 +66,7 @@ _Note: Official documentation for contexted library is [available on hexdocs][he
 
 <br/>
 
-## Installation
+## 📥 Installation
 
 Add the following to your `mix.exs` file:
 
@@ -72,7 +82,7 @@ Then run `mix deps.get`.
 
 <br/>
 
-## Step by step overview
+## 🧭 Step by step overview
 
 To describe a sample usage of this library, let's assume that your project has three contexts:
 
@@ -250,17 +260,18 @@ iex> App.Accounts.Users.__info__(:functions)
 ]
 ```
 
+
 Read more about `Contexted.CRUD` and its options in [docs](https://hexdocs.pm/contexted/Contexted.CRUD.html).
 
 <br/>
 
-# Contributing
+# 🤝 Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 <br/>
 
-# License
+# 📄 License
 
 [Curiosum](https://curiosum.com)
 
