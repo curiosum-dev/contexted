@@ -6,6 +6,7 @@ defmodule Contexted.Tracer do
   """
 
   alias Contexted.Utils
+  require Logger
 
   @doc """
   Trace events are emitted during compilation.
@@ -15,13 +16,13 @@ defmodule Contexted.Tracer do
   If so, raises an error with an appropriate message.
   """
   @spec trace(tuple(), map()) :: :ok
-  def trace({action, _meta, module, _name, _arity}, env)
+  def trace({action, meta, module, _name, _arity}, env)
       when action in [:imported_function, :remote_function, :remote_macro] do
-    verify_modules_mismatch(env.module, module, env.file)
+    verify_modules_mismatch(env.module, module, env.file, Keyword.get(meta, :line, 0))
   end
 
-  def trace({action, _meta, module, _opts}, env) when action in [:require] do
-    verify_modules_mismatch(env.module, module, env.file)
+  def trace({action, meta, module, _opts}, env) when action in [:require] do
+    verify_modules_mismatch(env.module, module, env.file, Keyword.get(meta, :line, 0))
   end
 
   def trace(_event, _env), do: :ok
@@ -71,8 +72,8 @@ defmodule Contexted.Tracer do
     end)
   end
 
-  @spec verify_modules_mismatch(module(), module(), String.t()) :: :ok
-  defp verify_modules_mismatch(analyzed_module, referenced_module, file) do
+  @spec verify_modules_mismatch(module(), module(), String.t(), integer()) :: :ok
+  defp verify_modules_mismatch(analyzed_module, referenced_module, file, line) do
     if is_file_excluded_from_check?(file) do
       :ok
     else
@@ -81,18 +82,46 @@ defmodule Contexted.Tracer do
 
       if analyzed_context_module != nil and
            referenced_context_module != nil and
-           analyzed_context_module != referenced_context_module do
+           analyzed_context_module != referenced_context_module and
+           !allowed_coupling?(analyzed_context_module, referenced_context_module) do
         stringed_referenced_context_module =
           Atom.to_string(referenced_context_module) |> String.replace("Elixir.", "")
 
         stringed_analyzed_context_module =
           Atom.to_string(analyzed_context_module) |> String.replace("Elixir.", "")
 
-        raise "You can't reference #{stringed_referenced_context_module} context within #{stringed_analyzed_context_module} context."
+        alert_mismatched_contexts(
+          stringed_referenced_context_module,
+          stringed_analyzed_context_module,
+          file,
+          line
+        )
       else
         :ok
       end
     end
+  end
+
+  @spec alert_mismatched_contexts(String.t(), String.t(), String.t(), integer()) :: :ok
+  defp alert_mismatched_contexts(referenced_context_module, analyzed_context_module, file, line) do
+    message =
+      "You can't reference #{referenced_context_module} context within #{analyzed_context_module} context [#{file}:#{line}]."
+
+    case Keyword.get(Utils.get_config_context_options(), :level, :error) do
+      :warn ->
+        Logger.warning(message)
+
+      :error ->
+        raise message
+    end
+  end
+
+  @spec allowed_coupling?(module(), module()) :: boolean()
+  defp allowed_coupling?(analyzed_context_module, referenced_context_module) do
+    Utils.get_config_context_options()
+    |> Keyword.get(:allow, [])
+    |> Keyword.get(analyzed_context_module, [])
+    |> Enum.member?(referenced_context_module)
   end
 
   @spec map_module_to_context_module(module()) :: module() | nil
