@@ -11,23 +11,29 @@ jobs:
   build_and_test:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        elixir_version: ['1.14', '1.15', '1.16', '1.17', '1.18']
+        otp_version: ['24', '25', '26', '27']
+        exclude:
+          - elixir_version: '1.14'
+            otp_version: '27'
+          - elixir_version: '1.15'
+            otp_version: '27'
+          - elixir_version: '1.16'
+            otp_version: '27'
+          - elixir_version: '1.17'
+            otp_version: '24'
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Extract Elixir and OTP versions from .tool-versions
-      id: extract_versions
-      run: |
-        elixir_version=$(grep -oP "elixir\s+\K.+" .tool-versions)
-        otp_version=$(grep -oP "erlang\s+\K.+" .tool-versions)
-        echo "elixir_version=$elixir_version" >> $GITHUB_ENV
-        echo "otp_version=$otp_version" >> $GITHUB_ENV
-
     - name: Set up Elixir
       uses: erlef/setup-elixir@v1
       with:
-        elixir-version: ${{ env.elixir_version }}
-        otp-version: ${{ env.otp_version }}
+        elixir-version: ${{ matrix.elixir_version }}
+        otp-version: ${{ matrix.otp_version }}
 
     - name: Restore dependencies and _build cache
       uses: actions/cache@v2
