@@ -1,0 +1,145 @@
+name: 🐛 Bug Report
+description: Report a bug in Contexted
+labels: ["bug", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Configure contexted with...
+        2. Add context module...
+        3. Run `mix compile`...
+        4. See error...
+      value: |
+        1.
+        2.
+        3.
+        4.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: What should have happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened instead?
+      placeholder: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Contexted configuration
+      description: Your contexted configuration from `config.exs`
+      render: elixir
+      placeholder: |
+        config :contexted,
+          contexts: [MyApp.Accounts, MyApp.Blog],
+          exclude_paths: []
+
+  - type: textarea
+    id: context-code
+    attributes:
+      label: Context code (if relevant)
+      description: Share relevant context module code that demonstrates the issue
+      render: elixir
+      placeholder: |
+        defmodule MyApp.Accounts do
+          import Contexted.Delegator
+          # ...
+        end
+
+  - type: input
+    id: contexted-version
+    attributes:
+      label: Contexted version
+      description: What version of Contexted are you using?
+      placeholder: "0.3.4"
+    validations:
+      required: true
+
+  - type: input
+    id: elixir-version
+    attributes:
+      label: Elixir version
+      description: What version of Elixir are you using?
+      placeholder: "1.15.7"
+    validations:
+      required: true
+
+  - type: input
+    id: otp-version
+    attributes:
+      label: OTP version
+      description: What version of Erlang/OTP are you using?
+      placeholder: "26.1"
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which Contexted component is affected?
+      multiple: true
+      options:
+        - Contexted.Tracer (cross-reference detection)
+        - Contexted.Delegator (function delegation)
+        - Contexted.CRUD (CRUD generation)
+        - Mix compiler integration
+        - Documentation generation
+        - Not sure / Multiple components
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-output
+    attributes:
+      label: Error output
+      description: If you're getting error messages, please paste them here
+      render: shell
+      placeholder: Paste any error messages, stack traces, or compiler output
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here, such as workarounds you've tried
+      placeholder: Any additional information that might help us understand the issue
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have searched the existing issues to make sure this bug hasn't been reported already
+          required: true
+        - label: I have read the documentation and confirmed this is a bug, not a configuration issue
+          required: true
+        - label: I can reproduce this issue consistently
+          required: true

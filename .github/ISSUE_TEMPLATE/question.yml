@@ -1,0 +1,103 @@
+name: ❓ Question
+description: Ask a question about using Contexted
+labels: ["question", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your question! Please provide as much context as possible to help us give you the best answer.
+
+        💡 **Tip**: For general discussions and community help, consider using [GitHub Discussions](https://github.com/curiosum-dev/contexted/discussions) or the [Elixir Slack channel](https://elixir-lang.slack.com/archives/C091Q5S0GDU).
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like to know about Contexted?
+      placeholder: Ask your question here...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What are you trying to accomplish? What have you already tried?
+      placeholder: |
+        Describe what you're working on and what you've already tried.
+        This helps us give you better, more specific advice.
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-setup
+    attributes:
+      label: Current Setup
+      description: Share your current Contexted configuration and relevant code
+      render: elixir
+      placeholder: |
+        # config.exs
+        config :contexted,
+          contexts: [MyApp.Accounts]
+
+        # Your context code
+        defmodule MyApp.Accounts do
+          # ...
+        end
+
+  - type: input
+    id: contexted-version
+    attributes:
+      label: Contexted Version
+      description: What version of Contexted are you using?
+      placeholder: "0.3.4"
+    validations:
+      required: true
+
+  - type: input
+    id: elixir-version
+    attributes:
+      label: Elixir Version
+      description: What version of Elixir are you using?
+      placeholder: "1.15.7"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: topic
+    attributes:
+      label: Topic Area
+      description: Which area does your question relate to?
+      options:
+        - Getting started / Setup
+        - Context cross-reference detection
+        - Function delegation
+        - CRUD generation
+        - Configuration
+        - Best practices
+        - Integration with Phoenix
+        - Performance
+        - Troubleshooting
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-info
+    attributes:
+      label: Additional Information
+      description: Any other details that might be helpful
+      placeholder: Links to relevant documentation you've read, error messages, etc.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before asking
+      options:
+        - label: I have read the [documentation](https://hexdocs.pm/contexted)
+          required: true
+        - label: I have searched existing issues and discussions
+          required: true
+

@@ -1,0 +1,142 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement for Contexted
+labels: ["enhancement", "needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible.
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature description
+      description: A clear and concise description of what you want to happen.
+      placeholder: Describe the feature you'd like to see...
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What problem does this feature solve? What use case does it enable?
+      placeholder: |
+        Describe the problem you're trying to solve or the use case this feature would enable.
+        Example: "When working with large Phoenix applications, I often need to..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed solution
+      description: Describe how you envision this feature working
+      placeholder: |
+        How do you think this should work? What API would you expect?
+
+        Example:
+        ```elixir
+        # New configuration option
+        config :contexted, new_option: true
+
+        # New macro or function
+        Contexted.SomeModule.new_function()
+        ```
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which Contexted component would this affect?
+      multiple: true
+      options:
+        - Contexted.Tracer (cross-reference detection)
+        - Contexted.Delegator (function delegation)
+        - Contexted.CRUD (CRUD generation)
+        - Mix compiler integration
+        - Configuration system
+        - Documentation generation
+        - New component/module
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: What alternatives have you considered? What are the trade-offs?
+      placeholder: |
+        Have you considered any alternative approaches to solving this problem?
+        What are the pros and cons of different solutions?
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve my workflow
+        - High - Blocking my work or causing significant pain
+        - Critical - Prevents me from using Contexted
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking-change
+    attributes:
+      label: Breaking change
+      description: Would this feature require breaking changes to the current API?
+      options:
+        - No - This is backward compatible
+        - Maybe - Not sure about compatibility
+        - Yes - This would require breaking changes
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example usage
+      description: Show how this feature would be used in practice
+      render: elixir
+      placeholder: |
+        # Example of how the feature would be used
+        defmodule MyApp.Accounts do
+          # ... your example code here
+        end
+
+  - type: textarea
+    id: context-integration
+    attributes:
+      label: Integration with existing features
+      description: How would this feature work with existing Contexted functionality?
+      placeholder: |
+        How should this feature integrate with:
+        - Cross-reference detection
+        - Function delegation
+        - CRUD generation
+        - Existing configuration options
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Add any other context, screenshots, links, or examples that help explain your request
+      placeholder: |
+        Any additional information, links to relevant discussions,
+        examples from other libraries, etc.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have searched the existing issues to make sure this feature hasn't been requested already
+          required: true
+        - label: I have read the documentation and confirmed this functionality doesn't already exist
+          required: true
+        - label: I am willing to help implement this feature (optional, but appreciated!)
+          required: false

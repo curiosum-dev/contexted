@@ -1,0 +1,15 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://hexdocs.pm/contexted
+    about: Read the official documentation for Contexted
+  - name: 💬 Community Discussion
+    url: https://elixir-lang.slack.com/archives/C091Q5S0GDU
+    about: Join the community discussion on Elixir Slack
+  - name: 📝 Blog & Tutorials
+    url: https://curiosum.com/blog?search=contexted
+    about: Check out blog posts and tutorials about Contexted
+  - name: ❓ General Questions
+    url: https://github.com/curiosum-dev/contexted/discussions
+    about: Ask general questions about Contexted usage and best practices
+

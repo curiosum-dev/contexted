@@ -10,8 +10,6 @@
 </div>
 
 
-<br/>
-
 ## 📦 Short overview
 
 [Contexts](https://hexdocs.pm/phoenix/contexts.html) in Elixir & Phoenix are getting complicated over time.
@@ -19,17 +17,9 @@ Cross-referencing, big modules and repetitiveness are the most common reasons fo
 
 Contexted arms you with a set of tools to maintain contexts well.
 
-<div>
-  <a href="https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml">
-    <img alt="CI Status" src="https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml/badge.svg">
-  </a>
-  <a href="https://hex.pm/packages/contexted">
-    <img alt="Hex Version" src="https://img.shields.io/hexpm/v/contexted.svg">
-  </a>
-  <a href="https://hexdocs.pm/contexted">
-    <img alt="Hex Docs" src="http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat">
-  </a>
-</div>
+[![Hex version badge](https://img.shields.io/hexpm/v/contexted.svg)](https://hex.pm/packages/contexted)
+[![Actions Status](https://github.com/curiosum-dev/contexted/actions/workflows/ci.yml/badge.svg)](https://github.com/curiosum-dev/contexted/actions)
+[![License badge](https://img.shields.io/hexpm/l/contexted.svg)](https://github.com/curiosum-dev/contexted/blob/main/LICENSE)
 
 <br/>
 
@@ -267,12 +257,38 @@ Read more about `Contexted.CRUD` and its options in [docs](https://hexdocs.pm/co
 
 # 🤝 Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+### Development setup
+
+Just clone the repository, install dependencies normally, develop and run tests. For running tests and static analysis tools, refer to [GitHub Action workflow definition](.github/workflows/ci.yml).
+
+<br/>
+
+## Media
+
+* [_Introducing Contexted Library_](https://www.youtube.com/watch?v=cjsyPausofM), S. Soppa, Curiosum Elixir Meetup #21, September 2023
+* [_Structuring Elixir & Phoenix project - our approach_](https://www.youtube.com/watch?v=oMFQ5N3WzfE), S. Soppa, Curiosum Elixir Meetup #1, January 2022
+* [_Introducing Contexted – Phoenix Contexts, Simplified_](https://curiosum.com/blog/introducing-contexted), Curiosum, February 2025
+* [_Context maintainability & guidelines in Elixir & Phoenix_](https://curiosum.com/blog/elixir-phoenix-context-maintainability-guildelines), Curiosum, December 2024
+
+<br/>
+
+## Community
+
+- **Slack channel**: [Elixir Slack / #contexted](https://elixir-lang.slack.com/archives/C091Q5S0GDU)
+- **Issues**: [GitHub Issues](https://github.com/curiosum-dev/contexted/issues)
+- **Blog**: [Curiosum Blog](https://curiosum.com/blog?search=contexted)
+
+<br/>
+
+## Contact
+
+* Library maintainers: [Szymon Soppa](https://github.com/szymon-soppa), [Michal Buszkiewicz](https://github.com/vincentvanbusk)
+* [**Curiosum**](https://curiosum.com) - Elixir development team behind Contexted
 
 <br/>
 
 # 📄 License
-
-[Curiosum](https://curiosum.com)
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
