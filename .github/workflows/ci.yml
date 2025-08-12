@@ -14,11 +14,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        elixir_version: ['1.14', '1.15', '1.16', '1.17', '1.18']
+        elixir_version: ['1.15', '1.16', '1.17', '1.18']
         otp_version: ['24', '25', '26', '27']
         exclude:
-          - elixir_version: '1.14'
-            otp_version: '27'
           - elixir_version: '1.15'
             otp_version: '27'
           - elixir_version: '1.16'

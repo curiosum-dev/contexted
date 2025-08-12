@@ -12,7 +12,7 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
 
 #### Prerequisites
 
-* Elixir 1.14+ and OTP 24+
+* Elixir 1.15+ and OTP 24+
   - _If implementing a proposed feature requires bumping Elixir or OTP, we're open to considering that._
 * Git
 

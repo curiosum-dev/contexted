@@ -10,7 +10,7 @@ defmodule Contexted.MixProject do
       description:
         "Contexted is an Elixir library designed to streamline the management of complex Phoenix contexts in your projects, offering tools for module separation, subcontext creation, and auto-generating CRUD operations for improved code maintainability.",
       version: @version,
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
