@@ -27,16 +27,16 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Elixir
-      uses: erlef/setup-elixir@v1
+      uses: erlef/setup-beam@v1
       with:
         elixir-version: ${{ matrix.elixir_version }}
         otp-version: ${{ matrix.otp_version }}
 
     - name: Restore dependencies and _build cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           deps
@@ -54,8 +54,9 @@ jobs:
     - name: Check formatting
       run: mix format --check-formatted
 
+    - name: Run credo
+      run: mix credo --strict
+
     - name: Run tests
       run: mix test
 
-    - name: Run credo
-      run: mix credo --strict
