@@ -24,6 +24,8 @@ jobs:
             otp_version: '27'
           - elixir_version: '1.17'
             otp_version: '24'
+          - elixir_version: '1.18'
+            otp_version: '24'
 
     steps:
     - name: Checkout code
