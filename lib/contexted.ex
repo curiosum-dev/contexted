@@ -206,4 +206,27 @@ defmodule Contexted do
 
   See more in [Contexted.CRUD](https://hexdocs.pm/contexted/Contexted.CRUD.html).
   """
+
+  @doc ~S"""
+  Marks a module reference as intentionally ignored by the cross‑context tracer.
+
+  Wrap a cross‑context module reference with `ignore/1` when you explicitly allow
+  that call and don't want `Contexted.Tracer` to raise a compile‑time error for it.
+
+  This function is a no‑op at runtime — it simply returns the module. It only
+  serves as a hint for the tracer during compilation.
+
+  ## Examples
+
+  Usage inside a context (the cross‑context call compiles because the module is wrapped):
+
+  ```elixir
+  defmodule App.Account.UserContext do
+    def hello(id) do
+      Contexted.ignore(App.Blog.PostContext).hello(id)
+    end
+  end
+  """
+  @spec ignore(module()) :: module()
+  def ignore(module), do: module
 end
