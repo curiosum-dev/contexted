@@ -64,7 +64,7 @@ defmodule Contexted.CRUD do
             resource_name: resource_name,
             plural_resource_name: plural_resource_name
           ] do
-      unless :list in exclude do
+      if :list not in exclude do
         function_name = String.to_atom("list_#{plural_resource_name}")
 
         @doc """
@@ -82,7 +82,7 @@ defmodule Contexted.CRUD do
         end
       end
 
-      unless :get in exclude do
+      if :get not in exclude do
         function_name = String.to_atom("get_#{resource_name}")
 
         @doc """
@@ -118,7 +118,7 @@ defmodule Contexted.CRUD do
         end
       end
 
-      unless :create in exclude do
+      if :create not in exclude do
         function_name = String.to_atom("create_#{resource_name}")
 
         @doc """
@@ -160,7 +160,7 @@ defmodule Contexted.CRUD do
         end
       end
 
-      unless :update in exclude do
+      if :update not in exclude do
         function_name = String.to_atom("update_#{resource_name}")
 
         @doc """
@@ -203,7 +203,7 @@ defmodule Contexted.CRUD do
         end
       end
 
-      unless :delete in exclude do
+      if :delete not in exclude do
         function_name = String.to_atom("delete_#{resource_name}")
 
         @doc """
@@ -233,7 +233,7 @@ defmodule Contexted.CRUD do
         end
       end
 
-      unless :change in exclude do
+      if :change not in exclude do
         function_name = String.to_atom("change_#{resource_name}")
 
         @doc """
