@@ -8,6 +8,7 @@ defmodule Contexted.CRUD do
   - `:schema` - The Ecto schema module representing the resource that these CRUD operations will be generated for (required)
   - `:exclude` - A list of atoms representing the functions to be excluded from generation (optional)
   - `:plural_resource_name` - A custom plural version of the resource name to be used in function names (optional). If not provided, singular version with 's' ending will be used to generate list function
+  - `:read_repo` - `{repo, function}` tuple for read operations (`list_*`, `get_*`). Writes still use `:repo`. Generates `crud_read_repo/0`, e.g. `{MyApp.Repo, :replica}`. When the primary `repo` reports `in_transaction?/0`, reads use that same repo.
 
   ## Usage
 
@@ -42,12 +43,13 @@ defmodule Contexted.CRUD do
   """
 
   defmacro __using__(opts) do
-    # Expanding opts
-    opts = Enum.map(opts, fn {key, val} -> {key, Macro.expand(val, __CALLER__)} end)
+    caller = __CALLER__
+    {read_repo_mfa, opts} = Keyword.pop(opts, :read_repo)
+
+    opts = Enum.map(opts, fn {key, val} -> {key, Macro.expand(val, caller)} end)
 
     repo = Keyword.fetch!(opts, :repo)
     schema = Keyword.fetch!(opts, :schema)
-
     exclude = Keyword.get(opts, :exclude, [])
     plural_resource_name = Keyword.get(opts, :plural_resource_name, nil)
 
@@ -56,14 +58,31 @@ defmodule Contexted.CRUD do
     plural_resource_name =
       if plural_resource_name, do: plural_resource_name, else: "#{resource_name}s"
 
+    read_repo_mf = normalize_read_repo(read_repo_mfa, caller)
+
     # credo:disable-for-next-line Credo.Check.Refactor.LongQuoteBlocks
     quote bind_quoted: [
             repo: repo,
             schema: schema,
             exclude: exclude,
             resource_name: resource_name,
-            plural_resource_name: plural_resource_name
+            plural_resource_name: plural_resource_name,
+            read_repo_mf: read_repo_mf
           ] do
+      defp crud_read_repo do
+        case unquote(read_repo_mf) do
+          nil ->
+            unquote(repo)
+
+          {read_mod, read_fun} ->
+            if unquote(repo).in_transaction?() do
+              unquote(repo)
+            else
+              apply(read_mod, read_fun, [])
+            end
+        end
+      end
+
       unless :list in exclude do
         function_name = String.to_atom("list_#{plural_resource_name}")
 
@@ -78,7 +97,7 @@ defmodule Contexted.CRUD do
         @spec unquote(function_name)() :: [%unquote(schema){}]
         def unquote(function_name)() do
           unquote(schema)
-          |> unquote(repo).all()
+          |> crud_read_repo().all()
         end
       end
 
@@ -97,7 +116,7 @@ defmodule Contexted.CRUD do
         @spec unquote(function_name)(integer() | String.t()) :: %unquote(schema){} | nil
         def unquote(function_name)(id) do
           unquote(schema)
-          |> unquote(repo).get(id)
+          |> crud_read_repo().get(id)
         end
 
         function_name = String.to_atom("get_#{resource_name}!")
@@ -114,7 +133,7 @@ defmodule Contexted.CRUD do
         @spec unquote(function_name)(integer() | String.t()) :: %unquote(schema){}
         def unquote(function_name)(id) do
           unquote(schema)
-          |> unquote(repo).get!(id)
+          |> crud_read_repo().get!(id)
         end
       end
 
@@ -254,5 +273,15 @@ defmodule Contexted.CRUD do
         end
       end
     end
+  end
+
+  defp normalize_read_repo(nil, _caller), do: nil
+
+  defp normalize_read_repo({module, function}, caller) when is_atom(function) do
+    {Macro.expand(module, caller), function}
+  end
+
+  defp normalize_read_repo(_, _caller) do
+    raise ArgumentError, ":read_repo must be {repo, function}, e.g. {MyApp.Repo, :replica}"
   end
 end
